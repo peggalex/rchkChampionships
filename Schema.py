@@ -3,22 +3,24 @@ from typing import Optional
 
 PLAYER_TABLE = DatedTable("player")
 
-PLAYER_SUMMONERID_COL = PLAYER_TABLE.CreateColumn("summonerId", INTEGER_TYPE, isPrimary = True)
+PLAYER_ACCOUNTID_COL = PLAYER_TABLE.CreateColumn("accountId", INTEGER_TYPE, isPrimary = True)
 PLAYER_SUMMONERNAME_COL = PLAYER_TABLE.CreateColumn("summonerName", VarCharType(30))
+PLAYER_ICONID_COL = PLAYER_TABLE.CreateColumn("iconId", INTEGER_TYPE)
 
-def AddPlayer(cursor: SqliteDB, summonerId: int, summonerName: str):
+def AddPlayer(cursor: SqliteDB, accountId: int, summonerName: str, iconId: int):
     cursor.InsertIntoTable(
         PLAYER_TABLE, {
-            PLAYER_SUMMONERID_COL: [summonerId], 
-            PLAYER_SUMMONERNAME_COL: [summonerName]
+            PLAYER_ACCOUNTID_COL: [accountId], 
+            PLAYER_SUMMONERNAME_COL: [summonerName],
+            PLAYER_ICONID_COL: [iconId]
         }
     )
 
-def PlayerExits(cursor: SqliteDB, summonerId: str) -> bool:
+def PlayerExits(cursor: SqliteDB, accountId: str) -> bool:
     return cursor.Exists(cursor.Q(
-        [PLAYER_SUMMONERID_COL], 
+        [PLAYER_ACCOUNTID_COL], 
         PLAYER_TABLE, 
-        {PLAYER_SUMMONERID_COL: summonerId}
+        {PLAYER_ACCOUNTID_COL: accountId}
     ))
     
 
@@ -50,7 +52,7 @@ def MatchExists(cursor: SqliteDB, matchId) -> bool:
 TEAMPLAYER_TABLE = DatedTable("teamPlayer")
 
 TEAMPLAYER_TABLE.CreateForeignKey(MATCH_MATCHID_COL, isPrimary = True)
-TEAMPLAYER_TABLE.CreateForeignKey(PLAYER_SUMMONERID_COL, isPrimary = True)
+TEAMPLAYER_TABLE.CreateForeignKey(PLAYER_ACCOUNTID_COL, isPrimary = True)
 TEAMPLAYER_CHAMPION_COL = TEAMPLAYER_TABLE.CreateColumn("champion", VarCharType(20))
 TEAMPLAYER_ISREDSIDE_COL = TEAMPLAYER_TABLE.CreateColumn("isRedSide", BOOL_TYPE)
 
@@ -74,7 +76,7 @@ def AddTeamPlayer(
     cursor.InsertIntoTable(
         TEAMPLAYER_TABLE, {
             MATCH_MATCHID_COL: [matchId], 
-            PLAYER_SUMMONERID_COL: [summonerId],
+            PLAYER_ACCOUNTID_COL: [summonerId],
             TEAMPLAYER_CHAMPION_COL: [champion],
             TEAMPLAYER_ISREDSIDE_COL: [isRedSide],
 

@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+body, button, input {
+  font-family: Poppins, sans-serif;
+}
+
+body {
+  font-weight: 700;
+}
+
+:root {
+  --leagueBrown: #C28F2C;
+  --leagueBlue: #0BC6E3;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.center {
+  justify-content: center;
+}
+
+.centerCross {
+  align-items: center;
+}
+
+.centerAll {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spacer {
+  display: flex;
+  flex: 1;
+}
+
+.tab {
+  text-decoration: unset;
+  color: black;
+  background-color: var(--grey300);
+  width: 10rem;
+  height: 2rem;
+  text-align: center;
+}
+
+header {
+  width: 100%;
+  height: 10rem;
+  background-color: black;
+}
+
+header > h1 {
+  text-transform: uppercase;
+  color: white;
+  font-size: 3rem;
+}
+
+header > h1 > span {
+  color: var(--leagueBrown);
+}
+
+#mainTabs {
+  padding: 1rem;
+}
+
+.mainTab > .selected {
+  background-color: var(--leagueBlue);
+}
+
+#mainTabs > .mainTab + .mainTab {
+  margin-left: 1.5rem;
+}
+
+#main {
+  max-width: 900px;
+  margin-bottom: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+footer {
+  font-weight: 400;
+  font-size: 0.8rem;
+  width: 100%;
+  text-align: center;
+  background-color: var(--grey300);
+  height: 2rem;
+  color: var(--grey700);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.circle {
+  width: var(--radius);
+  height: var(--radius);
+  border-radius: calc(var(--radius)/2);
+}
+
+@media (max-width: 1000px) {
+  html {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  html {
+    font-size: 7px;
+  }
+}

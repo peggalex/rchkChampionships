@@ -1,0 +1,201 @@
+#playerTopBar {
+    background-color: var(--grey400);
+    height: 3rem;
+    width: 100%;
+}
+
+#playerTopBar > :first-child {
+    margin-left: 1rem;
+}
+
+#playerTopBar > :last-child {
+    margin-right: 0.625rem;
+}
+
+#playerSort {
+    background-color: white;
+    border: none;
+    width: 5rem;
+    height: 1.75rem;
+    font-size: 1rem;
+    border-radius: 2rem;
+}
+
+#playerSearch {
+    border: none;
+    border-radius: 0.2rem;
+    height: 1.75rem;
+    width: 20vw;
+    min-width: 10rem;
+}
+
+.player {
+    background-color: var(--grey100);
+    height: 6.5rem;
+    z-index: 1;
+    position: relative;
+}
+
+.player.expanded {
+    box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+.champion {
+    background-color: var(--grey300);
+    height: 4rem;
+}
+
+
+.champion .mainStat {
+    font-size: 1.5rem;
+    text-align: end;
+}
+
+.champion .totalKda {
+    width: 5rem;
+}
+
+.champion .mainStat:not(:last-child){
+    margin-right: -0.25rem;
+}
+
+.champion .playerRightSide > * + * {
+    margin-left: 0;
+}
+
+.champion .statBreakdown {
+    transform: scale(0.75);
+}
+
+.player h2 {
+    font-size: 1.75rem;
+}
+
+.profilePic {
+    --radius: 3rem;
+    margin-right: 1rem;
+}
+
+.championIcon {
+    --radius: 2rem;
+    margin-left: 2rem;
+    margin-right: 1rem
+}
+
+.statContainer {
+    display: flex;
+}
+
+.statContainer.large {
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.statContainer.mini {
+    flex-direction: row;
+    align-items: center;
+}
+
+.playerRightSide {
+    margin-left: auto;
+    margin-right: 1rem;
+}
+
+.playerRightSide > * + * {
+    margin-left: 2rem;
+}
+
+.mainStat {
+    font-size: 2rem;
+    font-style: italic;
+    color: var(--grey800);
+}
+
+.mainStat:after {
+    font-size: 0.8rem;
+    margin-left: 0.4rem;
+    color: var(--grey600); 
+}
+
+.csMin {
+    width: 6rem;
+}
+
+.csMin.mini {
+    width: 5rem;
+}
+
+.totalKda:after {
+    content: "kda";
+}
+
+.winRateTotal:after {
+    content: "wr";
+}
+
+.csMin:after {
+    content: "cs/m";
+}
+
+.statBreakdown {
+    background-color: white;
+    padding: 0.1rem 0.75rem;
+}
+
+.statBreakdown > * {
+    width: 1.5rem;
+    display: inline-block;
+    text-align: end;
+}
+
+.noGames > * {
+    width: 1.5rem;
+}
+
+.kda > * {
+    width: 2rem;
+}
+
+.kda > .kills, .noGames > .wins {
+    color: var(--green);
+}
+
+.noGames > .wins:after {
+    content: "W"
+}
+
+.kda > .deaths, .noGames > .losses {
+    color: var(--red);
+}
+
+.noGames > .losses:after {
+    content: "L"
+}
+
+.kda > .assists {
+    color: var(--blue);
+}
+
+.noGames > .totalGames {
+    color: var(--grey700);
+}
+
+.noGames > .totalGames:before {
+    content: "|";
+    font-weight: 400;
+    margin-right: 0.5rem;
+}
+
+.statBreakdown > span + span {
+    margin-left: 0.75rem;
+}
+
+.collapseIcon > div {
+    margin: 0 0.75rem;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.collapseIcon svg {
+    color: var(--grey500);
+}

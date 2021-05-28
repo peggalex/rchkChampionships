@@ -1,8 +1,9 @@
 CREATE TABLE IF NOT EXISTS player(
 	timestamp INTEGER  NOT NULL,
-	summonerId INTEGER  NOT NULL,
+	accountId INTEGER  NOT NULL,
 	summonerName VARCHAR(30)  NOT NULL,
-	PRIMARY KEY (summonerId)
+	iconId INTEGER  NOT NULL,
+	PRIMARY KEY (accountId)
 );
 
 CREATE TABLE IF NOT EXISTS match(
@@ -17,14 +18,14 @@ CREATE TABLE IF NOT EXISTS match(
 CREATE TABLE IF NOT EXISTS teamPlayer(
 	timestamp INTEGER  NOT NULL,
 	matchId INTEGER  NOT NULL,
-	summonerId INTEGER  NOT NULL,
+	accountId INTEGER  NOT NULL,
 	champion VARCHAR(20)  NOT NULL,
 	isRedSide INTEGER CHECK(isRedSide IN (0, 1)) NOT NULL,
 	kills INTEGER  NOT NULL,
 	deaths INTEGER  NOT NULL,
 	assists INTEGER  NOT NULL,
 	csMin NUMERIC  NOT NULL,
-	PRIMARY KEY (matchId, summonerId),
+	PRIMARY KEY (matchId, accountId),
 	FOREIGN KEY (matchId) REFERENCES match(matchId),
-	FOREIGN KEY (summonerId) REFERENCES player(summonerId)
+	FOREIGN KEY (accountId) REFERENCES player(accountId)
 );

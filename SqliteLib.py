@@ -165,8 +165,10 @@ class SqliteDB():
     
     def __init__(self):
         self.connection = sqlite3.connect(DB_FILENAME)
+        self.connection.isolation_level = None
         self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()
+        self.Execute("BEGIN")
         
     def __enter__(self):
         return self
@@ -211,6 +213,7 @@ class SqliteDB():
         return self.Fetch(query) is not None
     
     def Rollback(self):
+        self.Execute("ROLLBACK")
         self.connection.rollback()
 
     def __exit__(self, type, value, traceback):

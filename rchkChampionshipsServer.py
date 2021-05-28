@@ -2,14 +2,11 @@ import traceback
 import logging as notFlaskLogging
 from flask import *
 from addMatch import addMatch
-from getMatch import getMatches, getPlayers
+from getMatch import getMatches, getPlayerStats
 from SqliteLib import SqliteDB
 
 notFlaskLogging.basicConfig(level=notFlaskLogging.DEBUG)
-app = Flask(__name__)
-
-def myCallback():
-    print('client: acknowledged response')
+app = Flask(__name__, static_folder='./react_app/build/static', template_folder="./react_app/build")
 
 @app.route('/addMatch', methods=['POST'])
 def addMatchEndpoint():
@@ -33,9 +30,9 @@ def addMatchEndpoint():
                 addMatch(cursor, html, isEncoded)
             except Exception as e:
                 error = str(e)
+                traceback.print_exc()
                 cursor.Rollback()
 
-    if error: print(error)
     return {"error": error}, 200 if error is None else 500
 
 @app.route('/getMatches', methods=['GET'])
@@ -49,9 +46,9 @@ def getMatchesEndpoint(summonerId = None, champion = None):
             res = getMatches(cursor, summonerId, champion)
         except Exception as e:
             error = str(e)
+            traceback.print_exc()
             cursor.Rollback()
 
-    if error: print(error)
     return {"error": error, "res": res}, 200 if error is None else 500
 
 
@@ -64,12 +61,16 @@ def getPlayerStatsEndpoint():
             res = getPlayerStats(cursor)
         except Exception as e:
             error = str(e)
+            traceback.print_exc()
             cursor.Rollback()
 
-    if error: print(error)
     return {"error": error, "res": res}, 200 if error is None else 500
 
+@app.route('/')
+@app.errorhandler(404)   
+def index(e = None):
+    return render_template('index.html')
 
 if __name__=="__main__":
     print('starting server...')
-    app.run("0.0.0.0")
+    app.run("0.0.0.0", debug=True)
