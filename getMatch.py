@@ -28,14 +28,49 @@ def getMatches(cursor, accountId = None, champion = None):
         TEAMPLAYER_ISREDSIDE_COL
     ]
 
-    matches = cursor.FetchAll(f"""
-        SELECT m.{MATCH_MATCHID_COL.name},{",".join([c.name for c in cols])}
+    teamPlayers = cursor.FetchAll(f"""
+        SELECT 
+            m.{MATCH_MATCHID_COL.name},
+            p.{PLAYER_ACCOUNTID_COL.name},
+            {",".join([c.name for c in cols])}
         FROM {MATCH_TABLE.name} m 
             JOIN {TEAMPLAYER_TABLE.name} tp ON m.{MATCH_MATCHID_COL.name} = tp.{MATCH_MATCHID_COL.name}
             JOIN {PLAYER_TABLE.name} p ON tp.{PLAYER_ACCOUNTID_COL.name} = p.{PLAYER_ACCOUNTID_COL.name}
         {whereClause}
-        ORDER BY {MATCH_DATE_COL.name} DESC, {TEAMPLAYER_ISREDSIDE_COL.name}
+        ORDER BY {MATCH_DATE_COL.name} DESC, m.{MATCH_MATCHID_COL.name} DESC, {TEAMPLAYER_ISREDSIDE_COL.name}
     """)
+
+    matches = []
+    for matchOffset in range(0, len(teamPlayers), 10):
+
+        firstPlayer = teamPlayers[matchOffset] # first match player
+
+        match = {
+            "matchId": firstPlayer[MATCH_MATCHID_COL.name],
+            "date": firstPlayer[MATCH_DATE_COL.name],
+            "redSideWon": firstPlayer[MATCH_REDSIDEWON_COL.name],
+            "teams": []
+        }
+        for teamOffset in range(0, 10, 5):
+            players = []
+            team = {
+                "isRedSide": bool(teamOffset//5), 
+                "players": players
+            }
+            for playerOffset in range(5):
+                teamPlayer = teamPlayers[matchOffset + teamOffset + playerOffset]
+
+                assert(teamPlayer[TEAMPLAYER_ISREDSIDE_COL.name] == team["isRedSide"])
+                assert(teamPlayer[MATCH_MATCHID_COL.name] == match["matchId"])
+
+                team["players"].append({
+                    "champion": teamPlayer[TEAMPLAYER_CHAMPION_COL.name],
+                    "accountId": teamPlayer[PLAYER_ACCOUNTID_COL.name],
+                    "name": teamPlayer[PLAYER_SUMMONERNAME_COL.name]
+                })
+            match["teams"].append(team)
+
+        matches.append(match)
 
     return matches
 
@@ -88,13 +123,12 @@ def getPlayerStats(cursor):
         accountId = player.pop(PLAYER_ACCOUNTID_COL.name)
         iconId = player.pop(PLAYER_ICONID_COL.name)
 
-        champions = []
         playerStats.append({
             "name": name, 
             "accountId": accountId, 
             "iconId": iconId,
             "allAvgs": player, 
-            "championAvgs": champions
+            "championAvgs": []
         })
 
         while i < len(avgPlayerChampStats):
@@ -106,7 +140,7 @@ def getPlayerStats(cursor):
                 champStat.pop(PLAYER_ACCOUNTID_COL.name)
                 champStat.pop(PLAYER_ICONID_COL.name)
 
-                champions.append(champStat)
+                playerStats[-1]["championAvgs"].append(champStat)
                 i+=1
             else:
                 break

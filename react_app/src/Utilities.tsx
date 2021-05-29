@@ -42,3 +42,6 @@ export async function waitForAjaxCall(url: string, method: RestfulType): Promise
         resolve(response.json());
 	});
 }
+
+export const GetChampIconUrl = (champ: string): string => `http://ddragon.leagueoflegends.com/cdn/11.11.1/img/champion/${champ}.png`;
+export const GetChampDisplayName = (champ: string): string => champ.replace(/([A-Z])/g, (m) => ` ${m}`).trim();

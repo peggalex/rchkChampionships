@@ -6,8 +6,7 @@ import './App.css';
 import './tailwindColours.css';
 import './Icons.css';
 import Players from './Players';
-
-const Matches = (): JSX.Element => <></>;
+import Matches from './Matches';
 
 const MainTab = ({ tab }: { tab: ITab }) =>
 	<div className='mainTab'>
@@ -19,7 +18,7 @@ const tabs: ITab[] = [
 		label: "players", 
 		route: "/players", 
 		component: Players,
-		otherPaths: []
+		otherPaths: ['/players/:accountId?']
 	},
 	{ 
 		label: "matches", 
@@ -29,7 +28,17 @@ const tabs: ITab[] = [
 	}
 ];
 
+const disclaimer = "RCHK Championships was created under Riot Games' \"Legal Jibber Jabber\" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project.";
 function App() {
+
+	React.useEffect(() => {
+		const disclaimerCookie = 'shownDisclaimer';
+		if (!document.cookie.split('; ').find(row => row.startsWith(disclaimerCookie))) {
+			alert(disclaimer);
+			document.cookie = `${disclaimerCookie}=true; expires=Fri, 31 Dec 9999 23:59:59 GMT; Secure`;
+		}
+	}, [])
+
 	return <>
 		<header className="centerAll">
 			<h1><span>RCHK</span> Championships</h1>
@@ -44,11 +53,14 @@ function App() {
 		</section>
 		<section id="main">
 			<Switch>
-				{tabs.map((tab, i) => <>{
+				{/*tabs.map((tab, i) => <>{
 					[tab.route, ...tab.otherPaths].map((path, j) =>
 						<Route path={path} component={tab.component} key={`${i},${j}`}/>
 					)
-				}</>)}
+				}</>)*/}
+				{tabs.map((tab, i) => 
+					<Route path={tab.route} component={tab.component} key={i}/>
+				)}
 				<Route path='/' component={() => <Redirect to={tabs[0].route}/>} />
 			</Switch>
 		</section>

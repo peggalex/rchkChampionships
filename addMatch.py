@@ -11,6 +11,7 @@ from SqliteLib import *
 WIN_STR = "VICTORY"
 REGION = "JP1"
 API_KEY = "RGAPI-076f8edd-fec8-4e01-bd7d-23f8797205d6"
+URL_ENCODED_BACKSLASH = '%2F'
 DEFAULT_ICON = 29
 BLUE_SIDE, RED_SIDE = 100, 200 # "100 for blue side. 200 for red side." (developer.riotgames.com/apis#match-v4)
 
@@ -62,7 +63,8 @@ def addPlayer(cursor, playerContainer, matchId, gameLength, isRedSide):
 
     if not PlayerExits(cursor, accountId):
         try:
-            iconId = makeRequest(f"https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{name}?api_key={API_KEY}")["profileIconId"]
+            iconUrl = f"https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{name}?api_key={API_KEY}"
+            iconId = makeRequest(iconUrl)["profileIconId"]
         except:
             iconId = 29
         AddPlayer(cursor, accountId, name, iconId)
@@ -88,25 +90,47 @@ def addMatch(cursor, html, isEncoded):
     except:
         raise Exception(f"Invalid HTML, make sure to follow steps correctly.")
 
-    if len(soup.find(id="main").contents) == 0:
-        raise Exception("HTML is valid but you have provided the page source without the content loaded, please follow the instructions correctly.")
+    assert (
+        len(soup.find(id="main").contents) != 0,
+        "HTML is valid but you have provided the page source without the content loaded, please follow the instructions correctly."
+    )
 
-    matchId = soup.select('.mail-button')[0]['href'].split('%2F')[-2]
-    if MatchExists(cursor, matchId):
-        raise Exception(f"Match with id '{matchId}' already registered.")
+    matchUrl = soup.select('.mail-button')[0]['href']
+    region = matchUrl.split(URL_ENCODED_BACKSLASH)[-3]
+    matchId = matchUrl.split(URL_ENCODED_BACKSLASH)[-2]
+    assert (
+        MatchExists(cursor, matchId),
+        f"Match with id '{matchId}' already registered."
+    )
+    assert (
+        region == REGION,
+        f"Match is in region: '{region}', should be in '{REGION}'"
+    )
 
-    """
     gameType = text(soup.select('.player-header-queue > div')[0])
-    if gameType.lower() != "custom":
-        raise Exception(f"Only custom games are allowed, this game is of type '{gameType}'")
+    assert (
+        gameType.lower() == "custom",
+        f"Only custom games are allowed, this game is of type '{gameType}'"
+    )
+
+
+    matchApi = f"https://{region.lower()}.api.riotgames.com/lol/match/v4/matches/{matchId}?api_key={API_KEY}"
+    riotRes = makeRequest(matchApi)
+
+    date = riotRes["gameCreation"]
     """
+    dateStr = text(soup.select('.player-header-date > div')[0])
+    date = datetime.strptime(dateStr, "%m/%d/%Y").timestamp()
+    """
+
+    assert (
+        riotRes["queueId"] == 0 and riotRes["gameMode"] == "CLASSIC",
+        f"Only custom games are allowed, this game is of type '{riotRes['gameMode']}'"
+    )
 
     gameLengthStr = text(soup.select('.player-header-duration > div')[0])
     m,s = [int(x) for x in gameLengthStr.strip().split(':')]
     gameLength = timedelta(minutes=m, seconds=s).total_seconds()
-
-    dateStr = text(soup.select('.player-header-date > div')[0])
-    date = datetime.strptime(dateStr, "%m/%d/%Y").timestamp()
 
     redSideWon = None
 

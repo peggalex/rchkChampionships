@@ -1,0 +1,104 @@
+.match {
+    background-color: var(--grey100);
+    height: 3rem;
+    z-index: 1;
+    position: relative;
+}
+
+.match.expanded {
+    box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.15);
+}
+
+.teamPlayer {
+    padding: 0.3rem;
+}
+
+.teamPlayer > p {
+    font-size: 1.25rem;
+    margin: 0.5rem;
+    color: var(--grey800);
+}
+
+.team.won {
+    background-color: var(--red100);
+}
+
+.team.lost {
+    background-color: var(--green100);
+}
+
+.matchHistory {
+    margin-left: auto;
+    text-decoration: none;
+    background-color: #fff;
+    height: 1.75rem;
+    border-radius: 1rem;
+    padding: 0 0.75rem;
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+}
+
+.matchHistory:before {
+    content: "match history";
+    color: var(--grey900);
+}
+
+.matchHistory > svg {
+    height: 1rem;
+    color: var(--leagueBlue);
+    stroke-width: 2.5;
+    margin-right: -0.5rem;
+}
+
+.matchTime, .matchYear {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0.6rem;
+    margin-left: 0.25rem;
+    font-size: 0.8rem;
+}
+
+.matchTime {
+    color: var(--grey700);
+    margin-left: 0.4rem;
+}
+
+.matchYear {
+    color: var(--grey600);
+    font-weight: 400;
+}
+
+.matchYear:before {
+    content: "•";
+    margin-right: .2rem;
+    margin-left: .1rem;
+    color: var(--grey700);
+}
+
+.teamPlayerChampionIcon {
+    --radius: 2rem;
+    margin-left: 1rem;
+    margin-right: 0;
+}
+
+#addMatch {
+    margin-left: auto;
+    border: 0.15rem solid var(--leagueBlue);
+    border-radius: 0.5rem;
+    font-weight: 700;
+    height: 2.1rem;
+    background-color: white;
+}
+
+#addMatch:before{
+    content: "add match";
+    margin-right: 0.5rem;
+    margin-left: 0.2rem;
+}
+
+#addMatch > svg {
+    height: 1.25rem;
+    color: var(--leagueBlue);
+    stroke-width: 2.5;
+    margin-right: -0.1rem;
+}

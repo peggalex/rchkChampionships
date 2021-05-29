@@ -17,7 +17,7 @@
     border: none;
     width: 5rem;
     height: 1.75rem;
-    font-size: 1rem;
+    font-size: .85rem;
     border-radius: 2rem;
 }
 
@@ -37,14 +37,13 @@
 }
 
 .player.expanded {
-    box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.15);
 }
 
 .champion {
     background-color: var(--grey300);
     height: 4rem;
 }
-
 
 .champion .mainStat {
     font-size: 1.5rem;

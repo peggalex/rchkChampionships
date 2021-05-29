@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
 import './App.css';
 import './tailwindColours.css';
-import { EnumArray, RestfulType, waitForAjaxCall } from './Utilities';
+import { EnumArray, GetChampDisplayName, GetChampIconUrl, RestfulType, waitForAjaxCall } from './Utilities';
 import "./Players.css";
 import Icons from './Icons';
 
@@ -28,7 +28,7 @@ interface IChampionAvg extends IAvg {
 
 interface IPlayer {
     name: string,
-    accountId: string,
+    accountId: number,
     iconId: string,
     allAvgs: IAvg,
     championAvgs: IChampionAvg[]
@@ -128,14 +128,12 @@ function PlayerChampion(
     {championAvg: IChampionAvg}
 ): JSX.Element {
 
-    let champDisplayName = champion.replace(/([A-Z])/g, (match) => ` ${match}`).trim();
     // champion is in pascal case
-    let iconUrl = `http://ddragon.leagueoflegends.com/cdn/11.11.1/img/champion/${champion}.png`;
 
     return <div className="champion row centerCross">
         <div className="playerLeftSide row centerCross">
-            <img className="championIcon circle" src={iconUrl}/>
-            <h2>{champDisplayName}</h2>
+            <img className="championIcon circle" src={GetChampIconUrl(champion)}/>
+            <h2>{GetChampDisplayName(champion)}</h2>
         </div>
         <div className="playerRightSide row centerCross">
             <WinRate wins={wins} games={noGames} isMini={true}/>
