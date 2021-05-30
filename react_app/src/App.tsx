@@ -25,6 +25,12 @@ const tabs: ITab[] = [
 		route: "/matches", 
 		component: Matches,
 		otherPaths: ['/matches/:summonerId?', '/matches/:summonerId/champion/:champion']
+	},
+	{ 
+		label: "add match", 
+		route: "/addMatch", 
+		component: Matches,
+		otherPaths: []
 	}
 ];
 

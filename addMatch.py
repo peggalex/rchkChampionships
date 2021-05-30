@@ -7,6 +7,7 @@ import json
 import quopri
 from Schema import *
 from SqliteLib import *
+from serverUtilities import assertGoodRequest 
 
 WIN_STR = "VICTORY"
 REGION = "JP1"
@@ -36,10 +37,6 @@ def makeRequest(query: str, level = 0):
             time.sleep(1)
             return makeRequest(query, level + 1)
     return res.json()
-
-def getSoup(html, isEncoded):
-    inp = str(quopri.decodestring(html)) if isEncoded else html
-    return BeautifulSoup(inp, 'html.parser')
 
 def decodeUtf8(s):
     # thank you so much https://stackoverflow.com/a/26882319
@@ -83,14 +80,14 @@ def addPlayer(cursor, playerContainer, matchId, gameLength, isRedSide):
 def text(soup):
     return soup.text.strip() 
 
-def addMatch(cursor, html, isEncoded):
+def addMatch(cursor, html):
 
     try:
-        soup = getSoup(html, isEncoded)
+        soup = BeautifulSoup(html, 'html.parser')
     except:
         raise Exception(f"Invalid HTML, make sure to follow steps correctly.")
 
-    assert (
+    assertGoodRequest(
         len(soup.find(id="main").contents) != 0,
         "HTML is valid but you have provided the page source without the content loaded, please follow the instructions correctly."
     )
@@ -98,21 +95,31 @@ def addMatch(cursor, html, isEncoded):
     matchUrl = soup.select('.mail-button')[0]['href']
     region = matchUrl.split(URL_ENCODED_BACKSLASH)[-3]
     matchId = matchUrl.split(URL_ENCODED_BACKSLASH)[-2]
-    assert (
-        MatchExists(cursor, matchId),
+    assertGoodRequest(
+        not MatchExists(cursor, matchId),
         f"Match with id '{matchId}' already registered."
     )
-    assert (
+    """
+    assertGoodRequest(
         region == REGION,
         f"Match is in region: '{region}', should be in '{REGION}'"
     )
+    """
 
+    gameMap = text(soup.select('.player-header-mode > div')[0])
     gameType = text(soup.select('.player-header-queue > div')[0])
-    assert (
+    """
+    assertGoodRequest(
         gameType.lower() == "custom",
-        f"Only custom games are allowed, this game is of type '{gameType}'"
+        f"Only custom games allowed, this game is '{gameType}'"
     )
-
+    """
+    """
+    assertGoodRequest(
+        gameMap.lower() == "summoner's rift",
+        f"Only summoner's rift games are allowed, this game is '{gameMap}'"
+    )
+    """
 
     matchApi = f"https://{region.lower()}.api.riotgames.com/lol/match/v4/matches/{matchId}?api_key={API_KEY}"
     riotRes = makeRequest(matchApi)
@@ -123,10 +130,16 @@ def addMatch(cursor, html, isEncoded):
     date = datetime.strptime(dateStr, "%m/%d/%Y").timestamp()
     """
 
-    assert (
-        riotRes["queueId"] == 0 and riotRes["gameMode"] == "CLASSIC",
-        f"Only custom games are allowed, this game is of type '{riotRes['gameMode']}'"
+    """
+    assertGoodRequest(
+        riotRes["queueId"] == 0,
+        f"Only custom games are allowed"
     )
+    assertGoodRequest(
+        riotRes["gameMode"] == "CLASSIC",
+        f"Only classic are allowed, this game is of type '{riotRes['gameMode']}'"
+    )
+    """
 
     gameLengthStr = text(soup.select('.player-header-duration > div')[0])
     m,s = [int(x) for x in gameLengthStr.strip().split(':')]
@@ -134,7 +147,9 @@ def addMatch(cursor, html, isEncoded):
 
     redSideWon = None
 
-    for teamContainer in soup.select(".classic.team"):
+    teams = soup.select(f".team.team-{RED_SIDE},.team.team-{BLUE_SIDE}")
+    assert(teams is not None)
+    for teamContainer in teams:
         isRedSide = f'team-{RED_SIDE}' in teamContainer['class']
         teamWon = text(teamContainer.select('.game-conclusion')[0]) == WIN_STR
         redSideWon = redSideWon or (isRedSide == teamWon)

@@ -1,10 +1,11 @@
 import json
 from Schema import *
 from SqliteLib import *
+from serverUtilities import assertGoodRequest 
 
 def getMatches(cursor, accountId = None, champion = None):
 
-    assert (
+    assertGoodRequest(
         champion is None or accountId is not None, 
         "Champion may only be specified if player is specified."
     )
@@ -60,8 +61,8 @@ def getMatches(cursor, accountId = None, champion = None):
             for playerOffset in range(5):
                 teamPlayer = teamPlayers[matchOffset + teamOffset + playerOffset]
 
-                assert(teamPlayer[TEAMPLAYER_ISREDSIDE_COL.name] == team["isRedSide"])
-                assert(teamPlayer[MATCH_MATCHID_COL.name] == match["matchId"])
+                assert teamPlayer[TEAMPLAYER_ISREDSIDE_COL.name] == team["isRedSide"]
+                assert teamPlayer[MATCH_MATCHID_COL.name] == match["matchId"]
 
                 team["players"].append({
                     "champion": teamPlayer[TEAMPLAYER_CHAMPION_COL.name],
@@ -145,5 +146,5 @@ def getPlayerStats(cursor):
             else:
                 break
 
-    assert(i == len(avgPlayerChampStats))
+    assert i == len(avgPlayerChampStats)
     return playerStats

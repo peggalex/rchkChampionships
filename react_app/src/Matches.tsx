@@ -95,6 +95,7 @@ function Matches(): JSX.Element {
 
     const [sort, setSort] = React.useState(PlayerSort.winrate);
     const [showFilterSelection, setShowFilterSelection] = React.useState(false);
+    const [showAddMatchPopup, setShowAddMatchPopup] = React.useState(false);
 
     const [matches, setMatches] = React.useState([] as any[]);
 
@@ -127,7 +128,11 @@ function Matches(): JSX.Element {
                 </div>
             : null}
             <div className="spacer"></div>
-            <button id="addMatch" className="row centerAll">{Icons.Plus}</button>
+            <button
+                id="addMatch" 
+                className="row centerAll clickable"
+                onClick={() => setShowAddMatchPopup(true)}
+            >{Icons.Plus}</button>
         </div>
         <div>
             {matches.map((m, i) => <Match match={m} key={i}/>)}
