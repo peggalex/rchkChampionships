@@ -1,7 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
-import './App.css';
-import './tailwindColours.css';
 import { EnumArray, GetChampDisplayName, GetChampIconUrl, RestfulType, waitForAjaxCall } from './Utilities';
 import "./Players.css";
 import Icons from './Icons';

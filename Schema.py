@@ -1,5 +1,6 @@
 from SqliteLib import *
 from typing import Optional
+from datetime import datetime, timedelta
 
 PLAYER_TABLE = DatedTable("player")
 
@@ -16,13 +17,28 @@ def AddPlayer(cursor: SqliteDB, accountId: int, summonerName: str, iconId: int):
         }
     )
 
-def PlayerExits(cursor: SqliteDB, accountId: str) -> bool:
+def PlayerExits(cursor: SqliteDB, accountId: int) -> bool:
     return cursor.Exists(cursor.Q(
         [PLAYER_ACCOUNTID_COL], 
         PLAYER_TABLE, 
         {PLAYER_ACCOUNTID_COL: accountId}
     ))
-    
+
+def GetSummonerName(cursor: SqliteDB, accountId: int):
+    return cursor.Fetch(cursor.Q(
+        [PLAYER_SUMMONERNAME_COL], 
+        PLAYER_TABLE, 
+        {PLAYER_ACCOUNTID_COL: accountId}
+    ))[PLAYER_SUMMONERNAME_COL.name]
+
+def UpdatePlayer(cursor: SqliteDB, accountId: int, summonerName: str, iconId: int):
+    cursor.Execute(f"""
+        UPDATE {PLAYER_TABLE}
+        SET 
+            {PLAYER_SUMMONERNAME_COL.name} = {summonerName}, 
+            {PLAYER_ICONID_COL.name} = {iconId}
+        WHERE {PLAYER_ACCOUNTID_COL.name} = {accountId}
+    """)
 
 MATCH_TABLE = DatedTable("match")
 
@@ -64,7 +80,7 @@ TEAMPLAYER_CSMIN_COL = TEAMPLAYER_TABLE.CreateColumn("csMin", FLOAT_TYPE)
 def AddTeamPlayer(
     cursor: SqliteDB, 
     matchId: int, 
-    summonerId: str, 
+    accountId: int, 
     champion: str, 
     isRedSide: bool, 
 
@@ -76,7 +92,7 @@ def AddTeamPlayer(
     cursor.InsertIntoTable(
         TEAMPLAYER_TABLE, {
             MATCH_MATCHID_COL: [matchId], 
-            PLAYER_ACCOUNTID_COL: [summonerId],
+            PLAYER_ACCOUNTID_COL: [accountId],
             TEAMPLAYER_CHAMPION_COL: [champion],
             TEAMPLAYER_ISREDSIDE_COL: [isRedSide],
 
@@ -86,6 +102,14 @@ def AddTeamPlayer(
             TEAMPLAYER_CSMIN_COL: [csMin]
         }
     )
+
+def GetMostRecentGame(cursor: SqliteDB, accountId: int):
+    cursor.Fetch(f"""
+        SELECT MAX({MATCH_DATE_COL.name})
+        FROM {MATCH_TABLE.name} m JOIN {TEAMPLAYER_TABLE.name} tp
+            ON m.{MATCH_MATCHID_COL.name} = tp.{MATCH_MATCHID_COL.name}
+        WHERE {PLAYER_ACCOUNTID_COL.name} = {accountId}
+    """)[MATCH_DATE_COL.name]
 
 if __name__ == "__main__":
     WriteSchema(

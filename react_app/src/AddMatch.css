@@ -1,0 +1,72 @@
+#addMatch {
+    background-color: var(--grey100);
+    padding: 1rem 3rem;
+}
+
+#addMatch > * {
+    text-align: center;
+}
+
+#addMatch > p {
+    font-size: 1rem;
+}
+
+#addMatchBtnContainer .loader{
+    --loaderDiameter: 3rem;
+}
+
+#addMatchBtn {
+    margin-left: auto;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    height: 2.1rem;
+    background-color: var(--leagueBlue);
+    border: none;
+}
+
+#addMatchBtn:before{
+    content: "add match";
+    margin-left: 0.2rem;
+}
+
+#addMatchBtn > svg {
+    height: 1rem;
+    stroke-width: 0.2rem;
+    color: var(--grey900);
+}
+
+#htmlUpload {
+    padding: 0.5rem 1rem;
+    background-color: var(--grey200);
+    border-radius: .4rem;
+    color: var(--grey800);
+    margin: 3rem 0 0 0;
+    margin-bottom: 0;
+}
+
+#htmlUpload > div {
+    margin-left: -0.4rem;
+}
+
+#htmlUpload > div > p{
+    margin: 0;
+}
+
+#addMatch input[type='file']{
+    display: none;
+}
+
+#htmlUpload svg {
+    height: 1rem;
+    stroke-width: 0.2rem;
+}
+
+#htmlUpload > p{
+    font-weight: 400;
+}
+
+#htmlUpload>p {
+    font-weight: 400;
+    margin: 0.25rem;
+    font-size: 0.9rem;
+}

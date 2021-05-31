@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
 import { ITab, Tab } from './Utilities';
-import logo from './logo.svg';
 import './App.css';
 import './tailwindColours.css';
 import './Icons.css';
 import Players from './Players';
 import Matches from './Matches';
+import AddMatch from './AddMatch';
 
 const MainTab = ({ tab }: { tab: ITab }) =>
 	<div className='mainTab'>
@@ -27,9 +27,9 @@ const tabs: ITab[] = [
 		otherPaths: ['/matches/:summonerId?', '/matches/:summonerId/champion/:champion']
 	},
 	{ 
-		label: "add match", 
+		label: "add match",
 		route: "/addMatch", 
-		component: Matches,
+		component: AddMatch,
 		otherPaths: []
 	}
 ];
@@ -45,7 +45,7 @@ function App() {
 		}
 	}, [])
 
-	return <>
+	return <div style={{minHeight: "100vh"}} className="col centerCross">
 		<header className="centerAll">
 			<h1><span>RCHK</span> Championships</h1>
 		</header>
@@ -59,21 +59,17 @@ function App() {
 		</section>
 		<section id="main">
 			<Switch>
-				{/*tabs.map((tab, i) => <>{
-					[tab.route, ...tab.otherPaths].map((path, j) =>
-						<Route path={path} component={tab.component} key={`${i},${j}`}/>
-					)
-				}</>)*/}
 				{tabs.map((tab, i) => 
 					<Route path={tab.route} component={tab.component} key={i}/>
 				)}
 				<Route path='/' component={() => <Redirect to={tabs[0].route}/>} />
 			</Switch>
 		</section>
+		<div className="spacer"></div>
 		<footer className="centerAll">
 			<p>Copyright © <a href="https://www.linkedin.com/in/alexvilapegg/" target="_blank">Alex Pegg</a> • All Rights Reserved</p>
 		</footer>
-	</>
+	</div>
 }
 
 export default App;

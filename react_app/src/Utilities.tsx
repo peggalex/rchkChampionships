@@ -31,14 +31,21 @@ export enum RestfulType {
     PUT
 }
 
-export async function waitForAjaxCall(url: string, method: RestfulType): Promise<any> {
+export async function waitForAjaxCall(
+    url: string, 
+    method: RestfulType, 
+    body: FormData|null = null
+): Promise<any> {
 	url = url.replace(/[ \t\n]/g, ''); // get rid of empty spaces and newlines
     var fullUrl = `${url}`;
 	return new Promise(async (resolve, reject) => {
         let response = await fetch(fullUrl, {
-            method: RestfulType[method]
+            method: RestfulType[method],
+            body: body
         });
-        if (!response.ok) reject(`${response.status} | ${response.statusText} | url: ${fullUrl}`);
+        console.log("response::")
+        console.info(response);
+        if (!response.ok) reject(response.json());
         resolve(response.json());
 	});
 }

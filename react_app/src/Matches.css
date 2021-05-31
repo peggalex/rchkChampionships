@@ -80,25 +80,3 @@
     margin-left: 1rem;
     margin-right: 0;
 }
-
-#addMatch {
-    margin-left: auto;
-    border: 0.15rem solid var(--leagueBlue);
-    border-radius: 0.5rem;
-    font-weight: 700;
-    height: 2.1rem;
-    background-color: white;
-}
-
-#addMatch:before{
-    content: "add match";
-    margin-right: 0.5rem;
-    margin-left: 0.2rem;
-}
-
-#addMatch > svg {
-    height: 1.25rem;
-    color: var(--leagueBlue);
-    stroke-width: 2.5;
-    margin-right: -0.1rem;
-}

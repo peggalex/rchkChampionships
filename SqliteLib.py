@@ -1,5 +1,7 @@
 import sqlite3
-newLineTab = "\n\t" #can't use backslashes in f strings
+newLine = "\n"
+tab = "\t"
+newLineTab = newLine + tab #can't use backslashes in f strings
 singleQuote = "'"
 from os import system
 from datetime import datetime
@@ -80,7 +82,6 @@ class Column:
         if self.foreignKey is None: raise ValueError("foreignKey is None")
         return f'FOREIGN KEY ({self.name}) REFERENCES {self.foreignKey.table.name}({self.foreignKey.name})'
 
-
 class Table:
 
     def __init__(self, name: str):
@@ -102,7 +103,7 @@ class Table:
             
         rowStrs.extend([col.GetForeignKeyStr() for col in self.columns if col.foreignKey != None])
             
-        return f"CREATE TABLE IF NOT EXISTS {self.name}({','.join([(newLineTab + s) for s in rowStrs])}\n);"
+        return f"""CREATE TABLE IF NOT EXISTS {self.name}({','.join([(newLineTab + s) for s in rowStrs])}{newLine});"""
 
     def CheckColumns(self, cols: List[Column]):
         if not set(cols).issubset([c.Source() for c in self.columns]): 

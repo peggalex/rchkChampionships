@@ -80,10 +80,8 @@ header > h1 > span {
 }
 
 #main {
-  max-width: 900px;
+  width: min(900px, 90vw);
   margin-bottom: 1rem;
-  margin-left: auto;
-  margin-right: auto;
   padding-left: 1rem;
   padding-right: 1rem;
 }
@@ -108,6 +106,22 @@ footer {
   border-radius: calc(var(--radius)/2);
 }
 
+.loader {
+  --loaderDiameter: 120px;
+  border: calc(var(--loaderDiameter) / 5) solid var(--grey200);
+  border-top: calc(var(--loaderDiameter) / 5) solid var(--leagueBrown);
+  border-radius: 50%;
+  width: var(--loaderDiameter);
+  height: var(--loaderDiameter);
+  animation: spin 2s linear infinite;
+}
+/* thanks to https://www.w3schools.com/howto/howto_css_loader.asp */
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @media (max-width: 800px) {
   html {
     font-size: 12px;
@@ -118,4 +132,9 @@ footer {
   html {
     font-size: 7px;
   }
+}
+
+button:disabled{
+  opacity: 0.15;
+  cursor: not-allowed;
 }

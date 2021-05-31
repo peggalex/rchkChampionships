@@ -1,7 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
-import './App.css';
-import './tailwindColours.css';
 import { EnumArray, GetChampIconUrl, RestfulType, waitForAjaxCall } from './Utilities';
 import "./Matches.css";
 import Icons from './Icons';
@@ -128,11 +126,11 @@ function Matches(): JSX.Element {
                 </div>
             : null}
             <div className="spacer"></div>
-            <button
+            {/*<button
                 id="addMatch" 
                 className="row centerAll clickable"
                 onClick={() => setShowAddMatchPopup(true)}
-            >{Icons.Plus}</button>
+            >{Icons.Plus}</button>*/}
         </div>
         <div>
             {matches.map((m, i) => <Match match={m} key={i}/>)}

@@ -38,6 +38,13 @@ def makeRequest(query: str, level = 0):
             return makeRequest(query, level + 1)
     return res.json()
 
+def getIcon(summonerName, region):
+    try:
+        iconUrl = f"https://{region.lower()}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summonerName}?api_key={API_KEY}"
+        return makeRequest(iconUrl)["profileIconId"]
+    except:
+        return 29
+
 def decodeUtf8(s):
     # thank you so much https://stackoverflow.com/a/26882319
     # example: b\\xc4\\xb1g => bıg
@@ -46,7 +53,7 @@ def decodeUtf8(s):
     except:
         return s
 
-def addPlayer(cursor, playerContainer, matchId, gameLength, isRedSide):
+def addPlayer(cursor, playerContainer, isRedSide, matchId, gameLength, date, region):
 
     champion = playerContainer.select('.champion-icon > div')[0]['data-rg-id']
     playerLink = playerContainer.select('.champion-nameplate-name > div > a')[0]
@@ -59,12 +66,12 @@ def addPlayer(cursor, playerContainer, matchId, gameLength, isRedSide):
     k,d,a = [text(x) for x in playerContainer.select('.kda-kda > div')]
 
     if not PlayerExits(cursor, accountId):
-        try:
-            iconUrl = f"https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{name}?api_key={API_KEY}"
-            iconId = makeRequest(iconUrl)["profileIconId"]
-        except:
-            iconId = 29
-        AddPlayer(cursor, accountId, name, iconId)
+        start = time.time()
+        AddPlayer(cursor, accountId, name, getIcon(name, region))
+        print("Time Elasped:", f"{time.time() - start:.2f}")
+    elif GetSummonerName(cursor, accountId) != name: # name has changed
+        if GetMostRecentGame(accountId) < date: # must call this before AddTeamPlayer
+            UpdatePlayer(cursor, accountId, name, getIcon(name, region))
 
     AddTeamPlayer(
         cursor, 
@@ -155,7 +162,7 @@ def addMatch(cursor, html):
         redSideWon = redSideWon or (isRedSide == teamWon)
 
         for playerContainer in teamContainer.select('li'):
-            addPlayer(cursor, playerContainer, matchId, gameLength, isRedSide)
+            addPlayer(cursor, playerContainer, isRedSide, matchId, gameLength, date, region)
 
     AddMatch(cursor, matchId, redSideWon, gameLength, date)
 

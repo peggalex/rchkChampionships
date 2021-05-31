@@ -10,7 +10,6 @@ import webarchive
 import os
 import tempfile
 
-
 notFlaskLogging.basicConfig(level=notFlaskLogging.DEBUG)
 app = Flask(__name__, static_folder='./react_app/build/static', template_folder="./react_app/build")
 
@@ -20,11 +19,11 @@ def handleException(cursor, e):
     if type(e) == BadRequestException:
         return {"error": f"{str(e)}"}, 400
     else:
-        return {"error": f"Server Error: {type(e)} -- {str(e)}"}, 500
+        return {"error": f"Server Error: {str(type(e))} -- {str(e)}"}, 500
 
 
 
-@app.route('/addMatch', methods=['POST'])
+@app.route('/addMatchText', methods=['POST'])
 def addMatchEndpoint():
 
     with SqliteDB() as cursor:
@@ -69,10 +68,10 @@ def upload_file():
 
     with SqliteDB() as cursor:
         try:
-            file = request.files['file']
+            file = request.files['html']
 
             assertGoodRequest(
-                'file' in request.files and file.filename != '',
+                'html' in request.files and file.filename != '',
                 "No File Selected"
             )
 
@@ -108,6 +107,14 @@ def upload_file():
         except Exception as e:
             return handleException(cursor, e)
 
+
+@app.route('/images/<filename>')
+def favicon(filename):
+
+    return send_from_directory(
+        os.path.join(app.root_path, 'react_app/build'),
+        filename
+    )
 
 @app.route('/')
 @app.errorhandler(404)   
