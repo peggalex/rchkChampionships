@@ -32,16 +32,15 @@
 .player {
     background-color: var(--grey100);
     height: 6.5rem;
-    z-index: 1;
-    position: relative;
 }
 
-.player.expanded {
-    box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.15);
+.championAvgsContainer {
+    box-shadow: inset 0 10px 10px -5px rgba(0, 0, 0, 0.15);
+    background-color: var(--grey300);
 }
 
 .champion {
-    background-color: var(--grey300);
+    background-color: transparent;
     height: 4rem;
 }
 

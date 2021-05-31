@@ -106,9 +106,10 @@ function Player(
                 <CreepScore csMin={avgCsMin} isMini={false}/>
             </div>
         </div>
-        <div>
-            {isExpanded ? championAvgs.map((c, i) => <PlayerChampion championAvg={c} key={i}/>) : null}
-        </div>
+        {isExpanded ? <div className="championAvgsContainer">
+                {championAvgs.map((c, i) => <PlayerChampion championAvg={c} key={i}/>)}
+            </div> : null
+        }
     </div>
 }
 

@@ -60,9 +60,10 @@ function Match(
             <p className="matchYear">{dateObj.getFullYear()}</p>
             <a className="matchHistory centerAll" href={matchLink} target="_blank">{Icons.Link}</a>
         </div>
-        <div className="row">
-            {isExpanded ? teams.map((t, i) => <Team team={t} redSideWon={redSideWon} key={i}/>) : null}
-        </div>
+        {isExpanded ? <div className="teamsContainer row">
+            {teams.map((t, i) => <Team team={t} redSideWon={redSideWon} key={i}/>)}
+            <div className="teamsShadow"></div>
+        </div> : null}
     </div>
 }
 
