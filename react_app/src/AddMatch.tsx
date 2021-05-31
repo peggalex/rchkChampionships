@@ -82,12 +82,12 @@ function AddMatch(){
                 <p><i>{fileName == "" ? "No file selected" : fileName}</i></p>
                 <div id="addMatchBtnContainer">
                     <button 
-                                id="addMatchBtn"
-                                className="row centerAll clickable" 
-                                onClick={sendFile}
-                                disabled={fileName == ""}
-                                title={fileName == "" ? "Upload a file first" : ""}
-                            >{Icons.Plus}</button>
+                        id="addMatchBtn"
+                        className="row centerAll clickable" 
+                        onClick={sendFile}
+                        disabled={fileName == ""}
+                        title={fileName == "" ? "Upload a file first" : ""}
+                    >{Icons.Plus}</button>
                 </div>
             </>
         }

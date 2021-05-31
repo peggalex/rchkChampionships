@@ -89,7 +89,7 @@ def getPlayerStats(cursor):
             {TEAMPLAYER_CHAMPION_COL.name},
             {PLAYER_SUMMONERNAME_COL.name},
             {PLAYER_ICONID_COL.name},
-            SUM(IIF({MATCH_REDSIDEWON_COL.name} = {TEAMPLAYER_ISREDSIDE_COL.name}, 1, 0)) AS {winsName},
+            SUM(CASE WHEN {MATCH_REDSIDEWON_COL.name} = {TEAMPLAYER_ISREDSIDE_COL.name} THEN 1 ELSE 0 END) AS {winsName},
             COUNT(*) AS {countName},
             {','.join((f'AVG({c.name}) AS {colToAvgName(c)}' for c in avgColumns))}
         FROM
