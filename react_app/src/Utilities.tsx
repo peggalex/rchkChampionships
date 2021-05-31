@@ -37,7 +37,7 @@ export async function waitForAjaxCall(
     body: FormData|null = null
 ): Promise<any> {
 	url = url.replace(/[ \t\n]/g, ''); // get rid of empty spaces and newlines
-    var fullUrl = `${url}`;
+    var fullUrl = `${process.env.PUBLIC_URL}/${url}`;
 	return new Promise(async (resolve, reject) => {
         let response = await fetch(fullUrl, {
             method: RestfulType[method],
