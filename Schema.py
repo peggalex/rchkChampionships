@@ -105,7 +105,7 @@ def AddTeamPlayer(
 
 def GetMostRecentGame(cursor: SqliteDB, accountId: int):
     cursor.Fetch(f"""
-        SELECT MAX({MATCH_DATE_COL.name})
+        SELECT MAX({MATCH_DATE_COL.name}) AS {MATCH_DATE_COL.name}
         FROM {MATCH_TABLE.name} m JOIN {TEAMPLAYER_TABLE.name} tp
             ON m.{MATCH_MATCHID_COL.name} = tp.{MATCH_MATCHID_COL.name}
         WHERE {PLAYER_ACCOUNTID_COL.name} = {accountId}
