@@ -52,8 +52,7 @@ function Match(
     let dateObj = new Date(date);
     let time = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(dateObj);
     let month = new Intl.DateTimeFormat('en-US', { month: 'long'}).format(dateObj);
-    //let day = dateObj.getDate();
-    let day = ((Math.floor(Math.random() * 3) + 1) * 10) + Math.floor(Math.random() * 4);
+    let day = dateObj.getDate();
     let daySuffix = getDaySuffix(day);
     const [isExpanded, setIsExpanded] = React.useState(true);
 

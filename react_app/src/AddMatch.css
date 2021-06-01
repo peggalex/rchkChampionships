@@ -107,6 +107,7 @@
     width: 100%;
     height: 10rem;
     margin-bottom: 1rem;
+    box-sizing: border-box;
     text-align: left;
     font-size: 0.8rem;
     padding: 0.5rem 0.75rem;

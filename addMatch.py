@@ -70,7 +70,7 @@ def addPlayer(cursor, playerContainer, isRedSide, matchId, gameLength, date, reg
         AddPlayer(cursor, accountId, name, getIcon(name, region))
         print("Time Elasped:", f"{time.time() - start:.2f}")
     elif GetSummonerName(cursor, accountId) != name: # name has changed
-        if GetMostRecentGame(accountId) < date: # must call this before AddTeamPlayer
+        if GetMostRecentGame(cursor, accountId) < date: # must call this before AddTeamPlayer
             UpdatePlayer(cursor, accountId, name, getIcon(name, region))
 
     AddTeamPlayer(
