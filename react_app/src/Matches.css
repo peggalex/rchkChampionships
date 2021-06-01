@@ -27,11 +27,11 @@
 }
 
 .team.won {
-    background-color: var(--red100);
+    background-color: var(--green100);
 }
 
 .team.lost {
-    background-color: var(--green100);
+    background-color: var(--red100);
 }
 
 .matchHistory {

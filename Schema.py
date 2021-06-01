@@ -33,9 +33,9 @@ def GetSummonerName(cursor: SqliteDB, accountId: int):
 
 def UpdatePlayer(cursor: SqliteDB, accountId: int, summonerName: str, iconId: int):
     cursor.Execute(f"""
-        UPDATE {PLAYER_TABLE}
+        UPDATE {PLAYER_TABLE.name}
         SET 
-            {PLAYER_SUMMONERNAME_COL.name} = {summonerName}, 
+            {PLAYER_SUMMONERNAME_COL.name} = '{summonerName}', 
             {PLAYER_ICONID_COL.name} = {iconId}
         WHERE {PLAYER_ACCOUNTID_COL.name} = {accountId}
     """)
