@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
-import { EnumArray, GetChampDisplayName, GetChampIconUrl, RestfulType, waitForAjaxCall } from './Utilities';
+import { EnumArray, GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI } from './Utilities';
 import "./Players.css";
 import Icons from './Icons';
 
@@ -150,7 +150,7 @@ function Players(): JSX.Element {
     const [players, setPlayers] = React.useState([] as any[]);
 
     async function getPlayers(){
-        let res = await waitForAjaxCall("/getPlayerStats", RestfulType.GET);
+        let res = await CallAPI("/getPlayerStats", RestfulType.GET);
         console.log(res);
         setPlayers(res["res"]);
     }

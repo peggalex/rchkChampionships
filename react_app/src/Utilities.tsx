@@ -31,17 +31,19 @@ export enum RestfulType {
     PUT
 }
 
-export async function waitForAjaxCall(
+export async function CallAPI(
     url: string, 
     method: RestfulType, 
-    body: FormData|null = null
+    body: any = null,
+    headers: any = {}
 ): Promise<any> {
 	url = url.replace(/[ \t\n]/g, ''); // get rid of empty spaces and newlines
     var fullUrl = `${process.env.PUBLIC_URL}/${url}`;
 	return new Promise(async (resolve, reject) => {
         fetch(fullUrl, {
             method: RestfulType[method],
-            body: body
+            body: body,
+            headers: headers
         }).then(async (response) => {
             if (!response.ok){
                 reject(await response.json());
@@ -51,6 +53,21 @@ export async function waitForAjaxCall(
         });
 	});
 }
+
+export const CallAPIJson = async (
+    url: string,
+    method: RestfulType,
+    body: Object
+) => CallAPI(
+    url, 
+    method, 
+    JSON.stringify(body),
+    {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+);
+
 
 export const GetChampIconUrl = (champ: string): string => `http://ddragon.leagueoflegends.com/cdn/11.11.1/img/champion/${champ}.png`;
 export const GetChampDisplayName = (champ: string): string => champ.replace(/([A-Z])/g, (m) => ` ${m}`).trim();

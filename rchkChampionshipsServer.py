@@ -123,4 +123,8 @@ def index(e = None):
 
 if __name__=="__main__":
     print('starting server...')
-    app.run("0.0.0.0", debug=True)
+    app.run(
+        "0.0.0.0", 
+        debug=True, 
+        port=3000
+    )

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
-import { EnumArray, GetChampIconUrl, RestfulType, waitForAjaxCall } from './Utilities';
+import { EnumArray, GetChampIconUrl, RestfulType, CallAPI } from './Utilities';
 import "./Matches.css";
 import Icons from './Icons';
 
@@ -29,6 +29,16 @@ interface IMatch {
     teams: ITeam[]
 }
 
+function getDaySuffix(day: number){
+    if (10 <= day && day < 20) return "th";
+    switch(day.toString().slice(-1)){
+        case "1": return "st";
+        case "2": return "nd";
+        case "3": return "rd";
+        default: return "th"
+    }
+}
+
 function Match(
     {match: {
         matchId, 
@@ -42,6 +52,9 @@ function Match(
     let dateObj = new Date(date);
     let time = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(dateObj);
     let month = new Intl.DateTimeFormat('en-US', { month: 'long'}).format(dateObj);
+    //let day = dateObj.getDate();
+    let day = ((Math.floor(Math.random() * 3) + 1) * 10) + Math.floor(Math.random() * 4);
+    let daySuffix = getDaySuffix(day);
     const [isExpanded, setIsExpanded] = React.useState(true);
 
     let region = "NA1";
@@ -55,7 +68,7 @@ function Match(
             <div className="collapseIcon">
                 {isExpanded ? Icons.ChevronDown : Icons.ChevronUp}
             </div>
-            <h2 className="matchMonth">{month} {dateObj.getDay()}</h2>
+            <h2 className="matchMonth">{month} {day}{daySuffix}</h2>
             <p className="matchTime">{time}</p>
             <p className="matchYear">{dateObj.getFullYear()}</p>
             <a className="matchHistory centerAll" href={matchLink} target="_blank">{Icons.Link}</a>
@@ -99,7 +112,7 @@ function Matches(): JSX.Element {
     const [matches, setMatches] = React.useState([] as any[]);
 
     async function getMatches(){
-        let res = await waitForAjaxCall("/getMatches", RestfulType.GET);
+        let res = await CallAPI("/getMatches", RestfulType.GET);
         setMatches(res["res"]);
     }
 
