@@ -88,9 +88,9 @@ header > h1 > span {
 
 footer {
   font-weight: 400;
-  font-size: 0.8rem;
-  width: 100%;
+  font-size: 12px;
   text-align: center;
+  width: 100%;
   background-color: var(--grey300);
   height: 2rem;
   color: var(--grey700);
@@ -137,4 +137,8 @@ footer {
 button:disabled{
   opacity: 0.15;
   cursor: not-allowed;
+}
+
+.accordionShadow{
+  box-shadow: inset 0 10px 10px -5px rgba(0, 0, 0, 0.15);
 }

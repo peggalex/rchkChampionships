@@ -49,7 +49,7 @@ function WinRate({wins, games, isMini}: {wins: number, games: number, isMini: bo
 }
 
 function KDAStat({k, d, a, isMini}: {k: number, d: number, a: number, isMini: boolean}){
-    let totalKda = ((k + a)/d).toFixed(isMini ? 1 : 2);
+    let totalKda = d == 0 ?  "∞" : ((k + a)/d).toFixed(isMini ? 1 : 2);
 
     return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"}`}>
         <span className="totalKda mainStat">
@@ -106,7 +106,7 @@ function Player(
                 <CreepScore csMin={avgCsMin} isMini={false}/>
             </div>
         </div>
-        {isExpanded ? <div className="championAvgsContainer">
+        {isExpanded ? <div className="championAvgsContainer accordionShadow">
                 {championAvgs.map((c, i) => <PlayerChampion championAvg={c} key={i}/>)}
             </div> : null
         }
@@ -132,7 +132,7 @@ function PlayerChampion(
     return <div className="champion row centerCross">
         <div className="playerLeftSide row centerCross">
             <img className="championIcon circle" src={GetChampIconUrl(champion)}/>
-            <h2>{GetChampDisplayName(champion)}</h2>
+            <h2 className="champName">{GetChampDisplayName(champion)}</h2>
         </div>
         <div className="playerRightSide row centerCross">
             <WinRate wins={wins} games={noGames} isMini={true}/>

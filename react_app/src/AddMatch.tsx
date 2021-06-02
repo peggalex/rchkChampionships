@@ -4,6 +4,27 @@ import { EnumArray, GetChampIconUrl, RestfulType, CallAPI as CallAPI, CallAPIJso
 import "./AddMatch.css";
 import Icons from './Icons';
 
+function HelpAccordion({title, component}: {title: string, component: JSX.Element}): JSX.Element {
+
+    const [isExpanded, setIsExpanded] = React.useState(false);
+
+    return <div className="helpContainer">
+        <div 
+            className={`helpTitle row centerCross clickable ${isExpanded ? "expanded" : ""}`} 
+            onClick={() => setIsExpanded(!isExpanded)}
+        >
+            {Icons.Help}
+            <h2>{title}</h2>
+            <div className="collapseIcon">
+                {isExpanded ? Icons.ChevronDown : Icons.ChevronUp}
+            </div>
+        </div>
+        <div className="helpBody accordionShadow col">
+            {isExpanded ? component : null}
+        </div>
+    </div>
+}
+
 function FileUpload(): JSX.Element{
     const fileRef = React.useRef(null as HTMLInputElement|null);
     const [isLoading, setIsLoading] = React.useState(false);
@@ -54,7 +75,20 @@ function FileUpload(): JSX.Element{
     }
 
     return isLoading ? <div className="loader"></div> : <>
-        <label>
+        <HelpAccordion title="Help saving html" component={<>
+            <ol>
+                <li>
+                    {"Chrome: right click page > Save as... > Web page, Single File"}
+                </li>   
+                <li>
+                    {"Firefox: right click page > Save Page As... > Web page, Complete"}
+                </li>
+                <li>
+                    {"Safari: right click page > Save Page As... > Web Archive"}
+                </li>
+            </ol>
+        </>}/>
+        <label id="htmlUploadContainer">
             <input 
                 onChange={onFileChange} 
                 ref={fileRef} 
@@ -123,7 +157,20 @@ function TextUpload(): JSX.Element{
         .finally(()=> setIsLoading(false));
     }
 
-    return isLoading ? <div className="loader"></div> : 
+    return isLoading ? <div className="loader"></div> : <>
+        <HelpAccordion title="Help pasting html" component={<>
+            <ol>
+                <li>
+                    {"Chrome: right click page > Inspect > right click html tag > Copy > Copy outerHTML"}
+                </li>   
+                <li>
+                    {"Firefox: right click page > Inspect > right click html tag > Copy > Outer Html"}
+                </li>
+                <li>
+                    {"Safari: right click page > Inspect Element > right click html tag > Copy > HTML"}
+                </li>
+            </ol>
+        </>}/>
         <div id="textUploadContainer" className="col">
             <textarea 
                 onChange={onChange} 
@@ -142,6 +189,7 @@ function TextUpload(): JSX.Element{
                 >{Icons.Plus}</button>
             </div>
         </div>
+    </>
 }
 
 const tabs: {name: string, caption: string, component: JSX.Element}[] = [
@@ -154,12 +202,29 @@ function AddMatch(): JSX.Element{
     const [tab, setTab] = React.useState(tabs[0]);
 
     return <div id="addMatch" className="col centerCross">
-        <p>Custom games are considered private data, and as a result, not available in riot APIs.</p>
-        <p>
-            To submit a match, please navigate to the game 
-            at <a href="https://matchhistory.na.leagueoflegends.com">matchhistory.na.leagueoflegends.com</a>, 
-            and either save and upload the html file, or if you’re technically inclined, paste the html code.
-        </p>
+        <div id="generalInfo">
+            <p>Custom games are considered private data, and as a result, are not available in public riot APIs.</p>
+            <p>
+                To submit a match, please navigate to the game 
+                at <a href="https://matchhistory.na.leagueoflegends.com">matchhistory.na.leagueoflegends.com</a>, 
+                and either save and upload the html file, or if you’re technically inclined, paste the html code.
+            </p>
+        </div>
+        <HelpAccordion title="Help navigating to the match page" component={<ol>
+            <li>
+                Log in to <a href="https://matchhistory.na.leagueoflegends.com">matchhistory.na.leagueoflegends.com</a>
+            </li>
+            <li>
+                <span>Select the game you wish to upload, navigating to a url that looks like:</span>
+                <br/>
+                <span className="urlExample">
+                    https://matchhistory.na.leagueoflegends.com/en/#match-details/JP1/
+                    <span>{"<matchId>"}</span>
+                    {"/"}
+                    <span>{"<summonerId>"}</span>
+                </span>
+            </li>
+        </ol>}/>
         <div id="addMatchTabContainer" className="row center">
             {
                 tabs.map((t, i) => <div 

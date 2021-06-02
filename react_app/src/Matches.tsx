@@ -74,7 +74,7 @@ function Match(
         </div>
         {isExpanded ? <div className="teamsContainer row">
             {teams.map((t, i) => <Team team={t} redSideWon={redSideWon} key={i}/>)}
-            <div className="teamsShadow"></div>
+            <div className="teamsShadow accordionShadow"></div>
         </div> : null}
     </div>
 }
