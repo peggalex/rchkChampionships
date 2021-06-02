@@ -136,11 +136,15 @@
 
 .helpContainer {
     width: 100%;
-    background-color: var(--grey200);
 }
 
 .helpTitle {
     height: 4rem; 
+    background-color: var(--grey200);
+}
+
+.helpBody {
+    /*background-color: var(--grey100);*/
 }
 
 .helpTitle h2, .helpContainer li {
