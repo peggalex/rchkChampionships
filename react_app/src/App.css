@@ -61,10 +61,13 @@ header > h1 {
   text-transform: uppercase;
   color: white;
   font-size: 3rem;
+  animation: slideIn ease-out 1s;
+  
 }
 
 header > h1 > span {
-  color: var(--leagueBrown);
+  color: white;
+  animation: toBrown ease-out 0.5s 0.75s forwards;
 }
 
 #mainTabs {
@@ -141,4 +144,25 @@ button:disabled{
 
 .accordionShadow{
   box-shadow: inset 0 10px 10px -5px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes slideIn {
+  from { 
+    padding-top: 6rem; 
+    opacity: 0;
+  }
+  to {
+    padding-top: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes toBrown {
+  from {
+    color: white;
+  }
+  to {
+    color: var(--leagueBrown);
+  }
+
 }
