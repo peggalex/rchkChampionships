@@ -95,7 +95,7 @@ footer {
   text-align: center;
   width: 100%;
   background-color: var(--grey300);
-  height: 2rem;
+  height: 32px;
   color: var(--grey700);
 }
 
