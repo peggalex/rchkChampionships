@@ -143,9 +143,11 @@
     background-color: var(--grey200);
 }
 
-.helpBody {
-    /*background-color: var(--grey100);*/
+.mainTab > .tab:hover{
+    background-color: white;
 }
+
+
 
 .helpTitle h2, .helpContainer li {
     color: var(--grey800);

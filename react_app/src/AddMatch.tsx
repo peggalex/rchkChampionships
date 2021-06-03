@@ -10,13 +10,13 @@ function HelpAccordion({title, component}: {title: string, component: JSX.Elemen
 
     return <div className="helpContainer">
         <div 
-            className={`helpTitle row centerCross clickable ${isExpanded ? "expanded" : ""}`} 
+            className={`helpTitle whiteWhenHovered row centerCross clickable ${isExpanded ? "expanded" : ""}`} 
             onClick={() => setIsExpanded(!isExpanded)}
         >
             {Icons.Help}
             <h2>{title}</h2>
             <div className="collapseIcon">
-                {isExpanded ? Icons.ChevronDown : Icons.ChevronUp}
+                {isExpanded ? Icons.ChevronUp : Icons.ChevronDown}
             </div>
         </div>
         <div className="helpBody accordionShadow col">
@@ -39,6 +39,8 @@ function FileUpload(): JSX.Element{
 
         if (files != null && 0 < files.length) {
             setFileName(files[0].name);      
+        } else {
+            setFileName("");      
         }
     }
 
@@ -109,7 +111,7 @@ function FileUpload(): JSX.Element{
         <div id="addMatchBtnContainer">
             <button 
                 id="addMatchBtn"
-                className="row centerAll clickable" 
+                className="row centerAll clickable whiteWhenHovered" 
                 onClick={sendFile}
                 disabled={fileName == ""}
                 title={fileName == "" ? "Upload a file first" : ""}
@@ -129,9 +131,7 @@ function TextUpload(): JSX.Element{
             return;
         }
         let html = textAreaElement.value;
-        if (html != "") {
-            setCanAdd(true);    
-        }
+        setCanAdd(html != "");
     }
 
     async function sendFile(){
@@ -181,7 +181,7 @@ function TextUpload(): JSX.Element{
             <div id="addMatchBtnContainer">
                 <button 
                     id="addMatchBtn"
-                    className="row centerAll clickable" 
+                    className="row centerAll clickable whiteWhenHovered" 
                     onClick={sendFile}
                     disabled={!canAdd}
                     title={canAdd ? "" : "Upload a file first"}
@@ -227,7 +227,7 @@ function AddMatch(): JSX.Element{
         <div id="addMatchTabContainer" className="row center">
             {
                 tabs.map((t, i) => <div 
-                    className={`addMatchTab clickable ${tab == t ? 'selected' : 'notSelected'}`}
+                    className={`addMatchTab whiteWhenHovered clickable ${tab == t ? 'selected' : 'notSelected'}`}
                     onClick={() => setTab(t)} 
                     key={i}
                 >

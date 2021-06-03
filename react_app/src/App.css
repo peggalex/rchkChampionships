@@ -4,6 +4,10 @@ body, button, input, textarea {
   font-family: Poppins, sans-serif;
 }
 
+* {
+  transition: background-color 0.5s;
+}
+
 body {
   font-weight: 700;
 }
@@ -144,6 +148,10 @@ button:disabled{
 
 .accordionShadow{
   box-shadow: inset 0 10px 10px -5px rgba(0, 0, 0, 0.15);
+}
+
+.whiteWhenHovered:hover {
+  background-color: white !important;
 }
 
 @keyframes slideIn {

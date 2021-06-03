@@ -61,11 +61,11 @@ function Match(
 
     return <div>
         <div 
-            className={`match row centerCross clickable ${isExpanded ? "expanded" : ""}`} 
+            className={`match whiteWhenHovered row centerCross clickable ${isExpanded ? "expanded" : ""}`} 
             onClick={() => setIsExpanded(!isExpanded)}
         >
             <div className="collapseIcon">
-                {isExpanded ? Icons.ChevronDown : Icons.ChevronUp}
+                {isExpanded ? Icons.ChevronUp :  Icons.ChevronDown}
             </div>
             <h2 className="matchMonth">{month} {day}{daySuffix}</h2>
             <p className="matchTime">{time}</p>

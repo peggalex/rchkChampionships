@@ -95,7 +95,7 @@ def addMatch(cursor, html):
         raise Exception(f"Invalid HTML, make sure to follow steps correctly.")
 
     assertGoodRequest(
-        soup.find(id="riotbar-container") is not None,
+        text(soup.find('title')) != "Match History" and soup.find(id="riotbar-container") is not None,
         "This isn't a League of Legends web page."
     )
 

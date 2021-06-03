@@ -8,6 +8,23 @@ export interface ITab {
     component: () => JSX.Element
 }
 
+export enum CompareType {
+    inOrder = -1,
+    same = 0,
+    outOfOrder = 1
+}
+
+export type CompareFunc = (a: any, b: any) => CompareType;
+
+export const CompareNumbers = (aNum: number, bNum: number): CompareType => {
+    console.log("inCompareNums", "aNum", aNum, "bNum", bNum);
+    if (aNum == bNum) return CompareType.same;
+    return aNum < bNum ? CompareType.inOrder : CompareType.outOfOrder;
+}
+
+export const NumericCompareFunc = (numFunc: (inp: any) => number): CompareFunc => 
+    (a, b) => CompareNumbers(numFunc(a), numFunc(b));
+
 export function Tab({tab}: {tab: ITab}){
 
     const location = useLocation();

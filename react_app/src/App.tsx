@@ -9,7 +9,7 @@ import Matches from './Matches';
 import AddMatch from './AddMatch';
 
 const MainTab = ({ tab }: { tab: ITab }) =>
-	<div className='mainTab'>
+	<div className='mainTab whiteWhenHovered'>
 		<Tab tab={tab} />
 	</div>
 

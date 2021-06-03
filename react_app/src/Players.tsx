@@ -1,15 +1,49 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
-import { EnumArray, GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI } from './Utilities';
+import { GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI, NumericCompareFunc, CompareNumbers, CompareType, CompareFunc } from './Utilities';
 import "./Players.css";
 import Icons from './Icons';
 
-enum PlayerSort {
-    winrate,
-    kda,
-    games,
-    name
-}
+
+const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
+    {
+        name: 'winrate', 
+        sort: NumericCompareFunc((p: IPlayer) =>  p.allAvgs.wins / p.allAvgs.noGames),
+        desc: true
+    },
+    {
+        name: 'kda', 
+        sort: NumericCompareFunc((p: IPlayer) => 
+            (p.allAvgs.avgKills + p.allAvgs.avgAssists) / p.allAvgs.avgDeaths
+        ),
+        desc: true
+    },
+    {
+        name: "cs",
+        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgCsMin),
+        desc: true
+    },
+    {
+        name: 'games', 
+        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.noGames),
+        desc: true
+    },
+    {
+        name: 'name', 
+        sort: (a: IPlayer, b: IPlayer) => {
+            let [aName, bName] = [a.name, b.name];
+
+            let shorterNameLen = Math.min(aName.length, bName.length);
+            for (let i = 0; i < shorterNameLen; i++){
+                let [aOrd, bOrd] = [aName.charCodeAt(i), bName.charCodeAt(i)];
+                let comparison = CompareNumbers(aOrd, bOrd);
+                if (comparison != CompareType.same) return comparison;
+            }
+            return NumericCompareFunc((x: string) => x.length)(aName, bName);
+        },
+        desc: false
+    }
+];
 
 interface IAvg {
     avgKills: number,
@@ -25,6 +59,7 @@ interface IChampionAvg extends IAvg {
 }
 
 interface IPlayer {
+    [x: string]: any;
     name: string,
     accountId: number,
     iconId: string,
@@ -92,11 +127,11 @@ function Player(
 
     return <div>
         <div 
-            className={`player row centerCross clickable ${isExpanded ? "expanded" : ""}`} 
+            className={`player whiteWhenHovered row centerCross clickable ${isExpanded ? "expanded" : ""}`} 
             onClick={() => setIsExpanded(!isExpanded)}
         >
             <div className="collapseIcon">
-                {isExpanded ? Icons.ChevronDown : Icons.ChevronUp}
+                {isExpanded ? Icons.ChevronUp : Icons.ChevronDown}
             </div>
             <img className="profilePic circle" src={iconUrl}/>
             <h2>{name}</h2>
@@ -144,45 +179,74 @@ function PlayerChampion(
 
 function Players(): JSX.Element {
 
-    const [sort, setSort] = React.useState(PlayerSort.winrate);
+    const [search, setSearch] = React.useState("");
+
+    const [sort, setSort] = React.useState(PlayerSort[0]);
     const [showFilterSelection, setShowFilterSelection] = React.useState(false);
 
-    const [players, setPlayers] = React.useState([] as any[]);
+    const [players, setPlayers] = React.useState([] as IPlayer[]);
+
+    function setPlayersSorted(oldPlayers: IPlayer[]){
+        let newPlayers = [...oldPlayers].sort(sort.sort);
+        if (sort.desc) newPlayers.reverse();
+        setPlayers(newPlayers);
+    }
 
     async function getPlayers(){
         let res = await CallAPI("/getPlayerStats", RestfulType.GET);
-        console.log(res);
-        setPlayers(res["res"]);
+        setPlayersSorted(res["res"]);
     }
 
     React.useEffect(() => {
         getPlayers();
     }, []);
 
+    React.useEffect(() => {
+        setPlayersSorted(players);
+    }, [sort]);
+
     return <div id="playersContainer">
         <div id="playerTopBar" className="row centerCross">
-            <button 
-                id="playerSort" 
-                className="clickable" 
-                onClick={() => setShowFilterSelection(!showFilterSelection)}
-            >
-                {PlayerSort[sort]}
-            </button>
-            {showFilterSelection ? 
-                <div id="playerSortSelection">
-                    {EnumArray(PlayerSort).map((s, i) => 
-                        <button 
-                            onClick={() => setSort((PlayerSort as any)[s])}
-                            key={i}
-                        >{s}</button>
-                    )}
+            <div id="sortContainer" className="col centerAll">
+                <div 
+                    id="playerSort" 
+                    className="clickable row centerCross whiteWhenHovered" 
+                    onClick={() => setShowFilterSelection(!showFilterSelection)}
+                >
+                    <p>{sort.name}</p>
+                    <span className="sortIcon">
+                        {sort.desc ? Icons.ChevronDown : Icons.ChevronUp}
+                    </span>
                 </div>
-            : null}
+                {showFilterSelection ? 
+                    <div id="playerSortSelection" className="col">
+                        {PlayerSort.map((s, i) => 
+                            <div 
+                                className={`sortOption clickable row centerCross ${s.name == sort.name ? "selected" : "notSelected"}`}
+                                onClick={() => {
+                                    if (s.name == sort.name) s.desc = !sort.desc;
+                                    setSort({...s}); 
+                                }}
+                                key={i}
+                            >
+                                <p>{s.name}</p>
+                                <div className="sortIcon">
+                                    {s.desc ? Icons.ChevronDown : Icons.ChevronUp}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                : null}
+            </div>
             <div className="spacer"></div>
-            <input id="playerSearch"/>
+            <input id="playerSearch" onChange={(e)=>setSearch(e.target.value)}/>
         </div>
         <div>
-            {players.map((p, i) => <Player player={p} key={i}/>)}
+            {
+                players
+                    .filter(p => p.name.toLowerCase().startsWith(search))
+                    .map((p, i) => <Player player={p} key={i}/>)
+            }
         </div>
     </div>;
 }
