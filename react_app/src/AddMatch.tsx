@@ -99,7 +99,7 @@ function FileUpload(): JSX.Element{
                 accept=".html,.mht,.mhtml,.webarchive" 
                 type="file"
             />
-            <div id="htmlUpload" className="col centerCross clickable">
+            <div id="htmlUpload" className="col centerCross clickable whiteWhenHovered">
                 <div className="row centerCross">
                     {Icons.Upload} 
                     <p>choose file</p>
