@@ -56,7 +56,7 @@ function Match(
     let daySuffix = getDaySuffix(day);
     const [isExpanded, setIsExpanded] = React.useState(true);
 
-    let region = "NA1";
+    let region = "JP1";
     let matchLink = `https://matchhistory.na.leagueoflegends.com/en/#match-details/${region}/${matchId}/00000?tab=overview`;
 
     return <div>
