@@ -95,6 +95,11 @@ def addMatch(cursor, html):
         raise Exception(f"Invalid HTML, make sure to follow steps correctly.")
 
     assertGoodRequest(
+        soup.find(id="riotbar-container") is not None,
+        "This isn't a League of Legends web page."
+    )
+
+    assertGoodRequest(
         len(soup.find(id="main").contents) != 0,
         "HTML is valid but you have provided the page source without the content loaded, please follow the instructions correctly."
     )
@@ -167,3 +172,4 @@ def addMatch(cursor, html):
     AddMatch(cursor, matchId, redSideWon, gameLength, date)
 
     print(gameLength, matchId, redSideWon)
+    return date

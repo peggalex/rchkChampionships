@@ -62,8 +62,9 @@ function FileUpload(): JSX.Element{
         
         setIsLoading(true);
         CallAPI("/addMatchHTML", RestfulType.POST, data)
-        .then(() => {
-            if (window.confirm("Added match, reload page?")){
+        .then(({date}: {date: number}) => {
+            let dateStr = new Date(date).toLocaleString("en-AU");
+            if (window.confirm(`Successfully added match from: ${dateStr}, reload page?`)){
                 window.location.href = "./matches";
             }
         }).catch((res)=>{
@@ -93,7 +94,7 @@ function FileUpload(): JSX.Element{
                 onChange={onFileChange} 
                 ref={fileRef} 
                 name="file" 
-                accept=".html,.mht,.webarchive" 
+                accept=".html,.mht,.mhtml,.webarchive" 
                 type="file"
             />
             <div id="htmlUpload" className="col centerCross clickable">
@@ -101,7 +102,7 @@ function FileUpload(): JSX.Element{
                     {Icons.Upload} 
                     <p>choose file</p>
                 </div>
-                <p>(.html, .mht, .webarchive)</p>
+                <p>(.html, .mht, .mhtml, .webarchive)</p>
             </div>
         </label>
         <p><i>{fileName == "" ? "No file selected" : fileName}</i></p>
@@ -140,16 +141,14 @@ function TextUpload(): JSX.Element{
         }
         let html = textAreaElement.value;
         if (html == "") {
-            textAreaElement.setCustomValidity("Please select file");
-            return textAreaElement.reportValidity();
-        } else {
-            textAreaElement.setCustomValidity("");
+            return;
         }
         
         setIsLoading(true);
         CallAPIJson("/addMatchText", RestfulType.POST, {'html': html})
-        .then(() => {
-            if (window.confirm("Added match, reload page?")){
+        .then(({date}: {date: number}) => {
+            let dateStr = new Date(date).toLocaleString("en-AU");
+            if (window.confirm(`Successfully added match from: ${dateStr}, reload page?`)){
                 window.location.href = "./matches";
             }
         })

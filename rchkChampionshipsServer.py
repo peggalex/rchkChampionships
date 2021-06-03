@@ -24,7 +24,7 @@ def handleException(cursor, e):
 
 
 @app.route('/addMatchText', methods=['POST'])
-def addMatchEndpoint():
+def addMatchTextEndpoint():
 
     with SqliteDB() as cursor:
         try:
@@ -35,8 +35,53 @@ def addMatchEndpoint():
                 "Expecting html field in post data."
             )
 
-            addMatch(cursor, data['html'])
-            return {}, 200
+            date = addMatch(cursor, data['html'])
+            return {"date": date}, 200
+
+        except Exception as e:
+            return handleException(cursor, e)
+
+
+@app.route('/addMatchHTML', methods=['POST'])
+def addMatchHTMLEndpoint():
+
+    with SqliteDB() as cursor:
+        try:
+            file = request.files['html']
+
+            assertGoodRequest(
+                'html' in request.files and file.filename != '',
+                "No File Selected"
+            )
+
+            ext = file.filename.split(".")[-1]
+
+            assertGoodRequest(
+                ext in ("html", "mht", "mhtml", "webarchive"),
+                "Wrong file extension (must be .html, .mht or .webarchive)"
+            )
+
+            if ext in ("mht", "mhtml"):
+                html = quopri.decodestring(file.read()).decode("latin")
+
+            elif ext == "webarchive":
+                webarchive_fd, webarchive_path = tempfile.mkstemp()
+                _, decoded_path = tempfile.mkstemp()
+                try:
+                    with os.fdopen(webarchive_fd, 'wb') as tmp:
+                        tmp.write(file.read())
+                    webarchive.open(webarchive_path).extract(decoded_path)
+                    with open(decoded_path, 'r') as f:
+                        html = f.read()
+                finally:
+                    os.remove(webarchive_path)
+                    os.remove(decoded_path)
+
+            else:
+                html = file.read().decode("latin")
+                
+            date = addMatch(cursor, html)
+            return {"date": date}, 200
 
         except Exception as e:
             return handleException(cursor, e)
@@ -60,50 +105,6 @@ def getPlayerStatsEndpoint():
     with SqliteDB() as cursor:
         try:
             return {"res": getPlayerStats(cursor)}, 200
-        except Exception as e:
-            return handleException(cursor, e)
-
-@app.route('/addMatchHTML', methods=['POST'])
-def upload_file():
-
-    with SqliteDB() as cursor:
-        try:
-            file = request.files['html']
-
-            assertGoodRequest(
-                'html' in request.files and file.filename != '',
-                "No File Selected"
-            )
-
-            ext = file.filename.split(".")[-1]
-
-            assertGoodRequest(
-                ext in ["html", "mht", "webarchive"],
-                "Wrong file extension (must be .html, .mht or .webarchive)"
-            )
-
-            if ext == "mht":
-                html = quopri.decodestring(file.read()).decode("latin")
-
-            elif ext == "webarchive":
-                webarchive_fd, webarchive_path = tempfile.mkstemp()
-                _, decoded_path = tempfile.mkstemp()
-                try:
-                    with os.fdopen(webarchive_fd, 'wb') as tmp:
-                        tmp.write(file.read())
-                    webarchive.open(webarchive_path).extract(decoded_path)
-                    with open(decoded_path, 'r') as f:
-                        html = f.read()
-                finally:
-                    os.remove(webarchive_path)
-                    os.remove(decoded_path)
-
-            else:
-                html = file.read().decode("latin")
-                
-            addMatch(cursor, html)
-            return {}, 200
-
         except Exception as e:
             return handleException(cursor, e)
 

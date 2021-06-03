@@ -50,7 +50,7 @@
 
 #htmlUpload {
     padding: 0.5rem 1rem;
-    background-color: var(--grey200);
+    background-color: var(--grey400);
     border-radius: .4rem;
     color: var(--grey800);
 }
@@ -80,7 +80,7 @@
 #htmlUpload>p {
     font-weight: 400;
     margin: 0.35rem;
-    font-size: 0.9rem;
+    font-size: 0.6rem;
 }
 
 .addMatchTab + .addMatchTab {
