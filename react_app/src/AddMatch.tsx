@@ -205,13 +205,13 @@ function AddMatch(): JSX.Element{
             <p>Custom games are considered private data, and as a result, are not available in public riot APIs.</p>
             <p>
                 To submit a match, please navigate to the game 
-                at <a href="https://matchhistory.na.leagueoflegends.com">matchhistory.na.leagueoflegends.com</a>, 
+                at <a href="https://matchhistory.na.leagueoflegends.com" target="_blank">matchhistory.na.leagueoflegends.com</a>, 
                 and either save and upload the html file, or if you’re technically inclined, paste the html code.
             </p>
         </div>
         <HelpAccordion title="Help navigating to the match page" component={<ol>
             <li>
-                Log in to <a href="https://matchhistory.na.leagueoflegends.com">matchhistory.na.leagueoflegends.com</a>
+                Log in to <a href="https://matchhistory.na.leagueoflegends.com" target="_blank">matchhistory.na.leagueoflegends.com</a>
             </li>
             <li>
                 <span>Select the game you wish to upload, navigating to a url that looks like:</span>

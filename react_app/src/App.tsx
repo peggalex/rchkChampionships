@@ -24,7 +24,7 @@ const tabs: ITab[] = [
 		label: "matches", 
 		route: "/matches", 
 		component: Matches,
-		otherPaths: ['/matches/:summonerId?', '/matches/:summonerId/champion/:champion']
+		otherPaths: ['/matches/:accId?', '/matches/:accId/champion/:champion']
 	},
 	{ 
 		label: "add match",
@@ -60,9 +60,11 @@ function App() {
 		<section id="main">
 			<Switch>
 				{tabs.map((tab, i) => 
-					<Route path={tab.route} component={tab.component} key={i}/>
-				)}
-				<Route path='/' component={() => <Redirect to={tabs[0].route}/>} />
+					[[tab.route, ...tab.otherPaths].map((p, j) => 
+						<Route path={p} exact component={tab.component} key={`${i}${j}`}/>
+					)]
+				).flatMap(x => x)}
+				<Route path='/' exact component={() => <Redirect to={tabs[0].route}/>} />
 			</Switch>
 		</section>
 		<div className="spacer"></div>

@@ -111,20 +111,19 @@ def addMatch(cursor, html):
         not MatchExists(cursor, matchId),
         f"Match with id '{matchId}' already registered."
     )
-
+    
     assertGoodRequest(
         region == REGION,
         f"Match is in region: '{region}', should be in '{REGION}'"
     )
-
+    
     gameMap = text(soup.select('.player-header-mode > div')[0])
     gameType = text(soup.select('.player-header-queue > div')[0])
-
+    
     assertGoodRequest(
         gameType.lower() == "custom",
-        f"Only custom games allowed, this game is '{gameType}'"
+        f"Only custom games allowed{f', this game is {gameType}' if gameType else ''}"
     )
-
 
     assertGoodRequest(
         gameMap.lower() == "summoner's rift",
@@ -136,7 +135,6 @@ def addMatch(cursor, html):
 
     date = riotRes["gameCreation"]
 
-    
     assertGoodRequest(
         riotRes["queueId"] == 0,
         f"Only custom games are allowed"
@@ -145,6 +143,7 @@ def addMatch(cursor, html):
         riotRes["gameMode"] == "CLASSIC",
         f"Only classic are allowed, this game is of type '{riotRes['gameMode']}'"
     )
+
 
     gameLengthStr = text(soup.select('.player-header-duration > div')[0])
     m,s = [int(x) for x in gameLengthStr.strip().split(':')]

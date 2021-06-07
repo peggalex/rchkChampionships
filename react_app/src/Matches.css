@@ -44,6 +44,10 @@
     margin-right: 0.5rem;
 }
 
+.matchHistory:hover {
+    color: var(--leagueBlue);
+}
+
 .matchHistory:before {
     content: "match history";
     color: var(--grey900);
@@ -85,4 +89,9 @@
     --radius: 2rem;
     margin-left: 1rem;
     margin-right: 0;
+}
+
+.matchHistory:hover:before {
+    color: var(--leagueBlue);
+    text-decoration: underline;
 }

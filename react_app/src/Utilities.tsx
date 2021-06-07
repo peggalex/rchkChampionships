@@ -55,7 +55,8 @@ export async function CallAPI(
     headers: any = {}
 ): Promise<any> {
 	url = url.replace(/[ \t\n]/g, ''); // get rid of empty spaces and newlines
-    var fullUrl = `${process.env.PUBLIC_URL}/${url}`;
+    //var fullUrl = `${process.env.PUBLIC_URL}/${url}`; //uncomment for prod
+    var fullUrl = `http://localhost:3000/${url}`;
 	return new Promise(async (resolve, reject) => {
         fetch(fullUrl, {
             method: RestfulType[method],
