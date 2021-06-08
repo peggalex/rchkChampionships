@@ -29,13 +29,14 @@
     top: 3rem;
     left: 0;
     max-height: 21.25rem;
-    overflow: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
     z-index: 2;
     background-color: rgba(255,255,255,0.9);
     border: solid var(--grey) 0.1rem;
     border-top: none;
     border-radius: 0 0 0.5rem 0.5rem;
-    width: 10rem;
+    width: 11rem;
     box-sizing: border-box;
 }
 
