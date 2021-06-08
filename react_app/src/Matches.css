@@ -13,6 +13,7 @@
     width: 100%;
     height: 100%;
     background-color: transparent;
+    pointer-events: none;
 }
 
 .teamPlayer {
@@ -23,6 +24,10 @@
     font-size: 1.25rem;
     margin: 0.5rem;
     color: var(--grey800);
+}
+
+.teamPlayer > p:hover {
+    color: var(--leagueBlue);
 }
 
 .team.won {

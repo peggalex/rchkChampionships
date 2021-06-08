@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, Redirect, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link, Redirect, useParams, useHistory } from 'react-router-dom';
 import { EnumArray, GetChampIconUrl, RestfulType, CallAPI } from './Utilities';
 import "./Matches.css";
 import Icons from './Icons';
@@ -107,14 +107,14 @@ function Team(
 }
 
 function TeamPlayer({player: {accountId, champion, name}}: {player: ITeamPlayer}): JSX.Element {
+    const history = useHistory();
     return <div className="teamPlayer row centerCross">
         <img className="teamPlayerChampionIcon circle" src={GetChampIconUrl(champion)}/>
-        <p className="clickable">{name}</p>
+        <p onClick={()=>history.push(`/players/${accountId}`)} className="clickable">{name}</p>
     </div>
 }
 
 const MatchContainsPlayerAndChampion = (match: IMatch, accountId?: number, champion?: string):boolean => {    
-    console.log('matchContains:', accountId, champion);
     return accountId === undefined || match.teams.some(t => 
         t.players.some(p => 
             p.accountId == accountId && (champion === undefined || p.champion == champion)
@@ -160,6 +160,15 @@ function getPlayers(matches: IMatch[]): IPlayerAggregate[]{
             champions: Array.from(new Set(players.map((p) => p.champion))).sort()
         } as IPlayerAggregate;
     }); // reshape this list of team players into a single player with a list of champions
+}
+
+function SortOption({label, onClick, isSelected}: {label: string, onClick: () => void, isSelected: boolean}){
+    return <div 
+        className={`sortOption clickable row centerCross ${isSelected ? "selected" : "notSelected"}`}
+        onClick={onClick}
+    >
+        <p>{label}</p>
+    </div>;
 }
 
 function Matches(): JSX.Element {
@@ -260,66 +269,75 @@ function Matches(): JSX.Element {
     async function getMatches(){
         let res = await CallAPI("/getMatches", RestfulType.GET);
         dispatch({type: "init", payload: {...state, matches: res["res"] as IMatch[]}});
+        if (accountId !== undefined){
+            document.querySelector("#main")?.scrollIntoView({ behavior: 'smooth', block: 'start'});
+        }
     }
 
     React.useEffect(() => {
         getMatches();
     }, []);
 
-    return <div id="playersContainer">
+    return <div id="matchesContainer">
         <div id="playerTopBar" className="row centerCross">
-            {<button 
-                id="playerSort" 
-                className="clickable" 
-                onClick={() => dispatch({type: "togglePlayerFilter"})}
-            >
-                {state.playerFilter.val === undefined ? "any player" : state.playerFilter.val!.name}
-            </button>}
-            {state.playerFilter.expanded ? 
-                <div id="playerSortSelection">
-                    <button 
-                        onClick={() => dispatch({
-                            type: "setPlayerFilter", 
-                            payload: {...state, playerFilter: {...state.playerFilter, val: undefined}}
-                        })}
-                    >ANY</button>
-                    {state.players.map((p, i) => 
-                        <button 
-                            onClick={() =>  dispatch({
+            <div className="sortContainer col centerAll">
+                <button 
+                    className="playerSort clickable" 
+                    onClick={() => dispatch({type: "togglePlayerFilter"})}
+                >
+                    {state.playerFilter.val === undefined ? "any player" : state.playerFilter.val!.name}
+                </button>
+                {state.playerFilter.expanded ? 
+                    <div className="playerSortSelection col">
+                        <SortOption label="ANY" onClick={() => dispatch({
                                 type: "setPlayerFilter", 
-                                payload: {...state, playerFilter: {...state.playerFilter, val: p}}
+                                payload: {...state, playerFilter: {...state.playerFilter, val: undefined}}
                             })}
-                            key={i}
-                        >{p.name}</button>
-                    )}
-                </div>
-            : null}
-            {state.playerFilter.val === undefined ? null : <button 
-                id="playerSort2" 
-                className="clickable" 
-                onClick={() => dispatch({type: "toggleChampionFilter"})}
-            >
-                {state.championFilter.val || "any champion"}
-            </button>}
-            {state.championFilter.expanded ? 
-                <div id="playerSortSelection">
-                    <button 
-                        onClick={() => dispatch({
-                            type: "setChampionFilter", 
-                            payload: {...state, championFilter: {...state.championFilter, val: undefined}}
-                        })}
-                    >ANY</button>
-                    {state.playerFilter.val!.champions.map((c, i) => 
-                        <button 
+                            isSelected={state.playerFilter.val === undefined}
+                        />
+                        {state.players.map((p, i) => 
+                            <SortOption label={p.name} onClick={() => dispatch({
+                                    type: "setPlayerFilter", 
+                                    payload: {...state, playerFilter: {...state.playerFilter, val: p}}
+                                })}
+                                key={i}
+                                isSelected={p.accountId == state.playerFilter.val?.accountId}
+                            />
+                        )}
+                    </div>
+                : null}
+            </div>
+            <div className="sortContainer col centerAll">
+                {state.playerFilter.val === undefined ? null : <button 
+                    className="playerSort clickable" 
+                    onClick={() => dispatch({type: "toggleChampionFilter"})}
+                >
+                    {state.championFilter.val || "any champion"}
+                </button>}
+                {state.championFilter.expanded ? 
+                    <div className="playerSortSelection col">
+                        <SortOption 
+                            label="ANY" 
                             onClick={() => dispatch({
                                 type: "setChampionFilter", 
-                                payload: {...state, championFilter: {...state.championFilter, val: c}}
+                                payload: {...state, championFilter: {...state.championFilter, val: undefined}}
                             })}
-                            key={i}
-                        >{c}</button>
-                    )}
-                </div>
-            : null}
+                            isSelected={state.championFilter.val === undefined}
+                        />
+                        {state.playerFilter.val!.champions.map((c, i) => 
+                            <SortOption 
+                                label={c}
+                                onClick={() => dispatch({
+                                    type: "setChampionFilter", 
+                                    payload: {...state, championFilter: {...state.championFilter, val: c}}
+                                })}
+                                key={i}
+                                isSelected={state.championFilter.val == c}
+                            />
+                        )}
+                    </div>
+                : null}
+            </div>
             <div className="spacer"></div>
         </div>
         <div>

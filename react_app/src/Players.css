@@ -8,48 +8,55 @@
     margin-right: 0.625rem;
 }
 
-#sortContainer {
+.sortContainer {
     position: relative;
     height: 100%;
-    width: 10rem;
+    padding-left: 0.5rem;
 }
 
-#playerSort {
+.playerSort {
     background-color: var(--grey100);
     border: none;
     color: var(--grey800);
     height: 1.75rem;
     font-size: .85rem;
     border-radius: 2rem;
-    padding: 0.1rem 0.3rem 0.1rem 0.75rem;
+    padding: 0.1rem 0.75rem;
 }
 
-#playerSortSelection {
+.playerSortSelection {
     position: absolute;
     top: 3rem;
-    z-index: 1;
+    left: 0;
+    max-height: 21.25rem;
+    overflow: scroll;
+    z-index: 2;
     background-color: rgba(255,255,255,0.9);
     border: solid var(--grey) 0.1rem;
     border-top: none;
     border-radius: 0 0 0.5rem 0.5rem;
-    width: 100%;
+    width: 10rem;
     box-sizing: border-box;
 }
 
 .sortOption {
     background-color: transparent;
     border: none;
-    height: 2.5rem;
+    min-height: 2.5rem;
     padding-left: 1rem;
 }
 
-#sortContainer p {
+.sortOption * {
+    transition: color 0s;
+}
+
+.sortContainer p {
     margin: 0;
     font-weight: 400;
     font-size: 0.85rem;
 }
 
-#playerSortSelection .sortIcon {
+.playerSortSelection .sortIcon {
     margin-left: auto;
     margin-right: 1rem;
 }
@@ -57,6 +64,7 @@
 .sortIcon {
     margin-left: 0.1rem;
     transform: scale(.7);
+    margin-right: -0.325rem;
 }
 
 .sortIcon > div {
@@ -88,6 +96,10 @@
 
 .champName {
     color: var(--grey900);
+}
+
+.champName:hover {
+    color: var(--leagueBlue);
 }
 
 .player {

@@ -18,7 +18,7 @@ const tabs: ITab[] = [
 		label: "players", 
 		route: "/players", 
 		component: Players,
-		otherPaths: ['/players/:accountId?']
+		otherPaths: ['/players/:accId?']
 	},
 	{ 
 		label: "matches", 

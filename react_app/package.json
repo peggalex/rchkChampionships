@@ -44,5 +44,5 @@
     "@types/react-router-dom": "^5.1.7",
     "typescript": "^4.3.2"
   },
-  "homepage": "."
+  "homepage": "http://127.0.0.1:3000"
 }

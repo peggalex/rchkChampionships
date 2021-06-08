@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
-import { GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI, NumericCompareFunc, CompareNumbers, CompareType, CompareFunc } from './Utilities';
+import { BrowserRouter as Router, Switch, Route, Link, Redirect, useHistory, useParams } from 'react-router-dom';
+import { GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI, NumericCompareFunc, CompareNumbers, CompareType, CompareFunc, GetPlayerElementId } from './Utilities';
 import "./Players.css";
 import Icons from './Icons';
 
@@ -108,6 +108,7 @@ function Player(
     {player: {
         name, 
         iconId, 
+        accountId,
         allAvgs: {
             avgKills, 
             avgDeaths, 
@@ -121,11 +122,24 @@ function Player(
     {player: IPlayer}
 ): JSX.Element {
 
-    const [isExpanded, setIsExpanded] = React.useState(false);
+    let { accId } = useParams() as { accId?: string };
+    let isSelected = accountId.toString() === accId; // use params will return a string
+
+    const elRef = React.useRef(null as HTMLDivElement|null);
+
+    let playerElementId = GetPlayerElementId(accountId);
+
+    const [isExpanded, setIsExpanded] = React.useState(isSelected);
+
+    React.useEffect(() => {
+        if (isSelected){
+            elRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start'});
+        }
+    }, []);
 
     let iconUrl = `http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/${iconId}.png`;
 
-    return <div>
+    return <div id={playerElementId} ref={elRef}>
         <div 
             className={`player whiteWhenHovered row centerCross clickable ${isExpanded ? "expanded" : ""}`} 
             onClick={() => setIsExpanded(!isExpanded)}
@@ -142,7 +156,11 @@ function Player(
             </div>
         </div>
         {isExpanded ? <div className="championAvgsContainer accordionShadow">
-                {championAvgs.map((c, i) => <PlayerChampion championAvg={c} key={i}/>)}
+                {championAvgs.map((c, i) => <PlayerChampion 
+                    championAvg={c} 
+                    accountId={accountId} 
+                    key={i}
+                />)}
             </div> : null
         }
     </div>
@@ -158,16 +176,20 @@ function PlayerChampion(
         avgCsMin,
         wins,
         noGames
-    }}:
-    {championAvg: IChampionAvg}
+    }, accountId}:
+    {championAvg: IChampionAvg, accountId: number}
 ): JSX.Element {
 
     // champion is in pascal case
+    const history = useHistory();
 
     return <div className="champion row centerCross">
         <div className="playerLeftSide row centerCross">
             <img className="championIcon circle" src={GetChampIconUrl(champion)}/>
-            <h2 className="champName">{GetChampDisplayName(champion)}</h2>
+            <h2 
+                onClick={() => history.push(`/matches/${accountId}/champion/${champion}`)} 
+                className="champName clickable"
+            >{GetChampDisplayName(champion)}</h2>
         </div>
         <div className="playerRightSide row centerCross">
             <WinRate wins={wins} games={noGames} isMini={true}/>
@@ -207,10 +229,9 @@ function Players(): JSX.Element {
 
     return <div id="playersContainer">
         <div id="playerTopBar" className="row centerCross">
-            <div id="sortContainer" className="col centerAll">
+            <div className="sortContainer col centerAll">
                 <div 
-                    id="playerSort" 
-                    className="clickable row centerCross whiteWhenHovered" 
+                    className="playerSort clickable row centerCross whiteWhenHovered" 
                     onClick={() => setShowFilterSelection(!showFilterSelection)}
                 >
                     <p>{sort.name}</p>
@@ -219,7 +240,7 @@ function Players(): JSX.Element {
                     </span>
                 </div>
                 {showFilterSelection ? 
-                    <div id="playerSortSelection" className="col">
+                    <div className="playerSortSelection col">
                         {PlayerSort.map((s, i) => 
                             <div 
                                 className={`sortOption clickable row centerCross ${s.name == sort.name ? "selected" : "notSelected"}`}

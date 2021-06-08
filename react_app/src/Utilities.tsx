@@ -86,6 +86,7 @@ export const CallAPIJson = async (
     }
 );
 
+export const GetPlayerElementId = (accountId: number): string => `player${accountId}`;
 
 export const GetChampIconUrl = (champ: string): string => `http://ddragon.leagueoflegends.com/cdn/11.11.1/img/champion/${champ}.png`;
 export const GetChampDisplayName = (champ: string): string => champ.replace(/([A-Z])/g, (m) => ` ${m}`).trim();
