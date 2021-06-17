@@ -260,12 +260,15 @@ function Players(): JSX.Element {
                 : null}
             </div>
             <div className="spacer"></div>
-            <input id="playerSearch" onChange={(e)=>setSearch(e.target.value)}/>
+            <div className="row centerCross">
+                <div id="playerSearchIcon" className="row centerAll">{Icons.Search}</div>
+                <input id="playerSearch" onChange={(e)=>setSearch(e.target.value)} autoComplete='off' spellCheck='false' autoCorrect='off'/>
+            </div>
         </div>
         <div>
             {
                 players
-                    .filter(p => p.name.toLowerCase().startsWith(search))
+                    .filter(p => p.name.toLowerCase().startsWith(search?.toLowerCase()))
                     .map((p, i) => <Player player={p} key={i}/>)
             }
         </div>

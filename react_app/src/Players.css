@@ -92,7 +92,20 @@
     border-radius: 0.2rem;
     height: 1.75rem;
     width: 20vw;
+    max-width: 12.5rem;
     min-width: 10rem;
+    padding-left: 1.75rem;
+    color: var(--grey800);
+}
+
+#playerSearchIcon {
+    position: absolute;
+    color: var(--grey700);
+    margin-left: 0.35rem;
+}
+
+#playerSearchIcon svg {
+    width: 1.1rem;
 }
 
 .champName {
