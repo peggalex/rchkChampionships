@@ -20,7 +20,7 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
     },
     {
         name: "cs",
-        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgCsMin),
+        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgCs),
         desc: true
     },
     {
@@ -49,7 +49,11 @@ interface IAvg {
     avgKills: number,
     avgDeaths: number,
     avgAssists: number,
-    avgCsMin: number,
+    avgCs: number,
+    avgKp: number,
+    avgDmgDealt: number,
+    avgDmgTaken: number,
+    avgGold: number,
     wins: number,
     noGames: number
 }
@@ -98,10 +102,56 @@ function KDAStat({k, d, a, isMini}: {k: number, d: number, a: number, isMini: bo
     </div>
 }
 
-function CreepScore({csMin, isMini}: {csMin: number, isMini: boolean}){
+function CreepScore({cs, isMini}: {cs: number, isMini: boolean}){
     return <span className={`csMin mainStat ${isMini ? "mini" : "large"}`}>
-        {csMin.toFixed(1)}
+        {cs.toFixed(1)}
     </span>
+}
+
+function AdditionalStats({
+            kp, 
+            dmgDealt, 
+            dmgTaken, 
+            gold, 
+            isPerMin
+        }: {
+            kp: number,
+            dmgDealt: number, 
+            dmgTaken: number, 
+            gold: number, 
+            isPerMin: boolean
+        }){
+
+    let data = [
+        {
+            icon: Icons.KillParticipationIcon,
+            value: `${Math.round(kp)}%`,
+            label: "kill participation"
+        },
+        {
+            icon: Icons.DmgDealtIcon,
+            value: Math.round(dmgDealt),
+            label: `damage dealt${isPerMin ? ' per minute' : ""}`
+        },
+        {
+            icon: Icons.DmgTakenIcon,
+            value: Math.round(dmgTaken),
+            label: `damage taken${isPerMin ? ' per minute' : ""}`
+        },
+        {
+            icon: Icons.GoldIcon,
+            value: Math.round(gold),
+            label: `gold${isPerMin ? ' per minute' : ""}`
+        }
+    ]
+
+    return <div className="additionalStats row centerCross spaceAround">
+        {data.map((d, i) => <div className="row centerAll" title={d.label} key={i}>
+            <div className="additionalStatIcon row centerAll">{d.icon}</div>
+            <div>{d.value}</div>
+        </div>
+        )}
+    </div>
 }
 
 function Player(
@@ -113,7 +163,11 @@ function Player(
             avgKills, 
             avgDeaths, 
             avgAssists, 
-            avgCsMin,
+            avgCs,
+            avgKp,
+            avgDmgDealt,
+            avgDmgTaken,
+            avgGold,
             wins,
             noGames
         }, 
@@ -149,10 +203,13 @@ function Player(
             </div>
             <img className="profilePic circle" src={iconUrl}/>
             <h2>{name}</h2>
-            <div className="playerRightSide row centerCross">
-                <WinRate wins={wins} games={noGames} isMini={false}/>
-                <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} isMini={false}/>
-                <CreepScore csMin={avgCsMin} isMini={false}/>
+            <div className="playerRightSide col">
+                <div className="mainStats row centerCross">
+                    <WinRate wins={wins} games={noGames} isMini={false}/>
+                    <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} isMini={false}/>
+                    <CreepScore cs={avgCs} isMini={false}/>
+                </div>
+                <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
             </div>
         </div>
         {isExpanded ? <div className="championAvgsContainer accordionShadow">
@@ -173,7 +230,11 @@ function PlayerChampion(
         avgKills, 
         avgDeaths, 
         avgAssists, 
-        avgCsMin,
+        avgCs,
+        avgKp,
+        avgDmgDealt,
+        avgDmgTaken,
+        avgGold,
         wins,
         noGames
     }, accountId}:
@@ -191,10 +252,13 @@ function PlayerChampion(
                 className="champName clickable"
             >{GetChampDisplayName(champion)}</h2>
         </div>
-        <div className="playerRightSide row centerCross">
-            <WinRate wins={wins} games={noGames} isMini={true}/>
-            <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} isMini={true}/>
-            <CreepScore csMin={avgCsMin} isMini={true}/>
+        <div className="playerRightSide col">
+            <div className="row centerCross">
+                <WinRate wins={wins} games={noGames} isMini={true}/>
+                <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} isMini={true}/>
+                <CreepScore cs={avgCs} isMini={true}/>
+            </div>
+            <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
         </div>
     </div>
 }

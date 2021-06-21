@@ -41,6 +41,11 @@ body {
   align-items: center;
 }
 
+.spaceAround {
+  display: flex;
+  justify-content: space-around;
+}
+
 .spacer {
   display: flex;
   flex: 1;

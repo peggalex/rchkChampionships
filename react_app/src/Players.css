@@ -118,7 +118,8 @@
 
 .player {
     background-color: var(--grey100);
-    height: 6.5rem;
+    height: 7.5rem;
+    padding: 0.5rem 0;
 }
 
 .championAvgsContainer {
@@ -185,7 +186,7 @@
     margin-right: 1rem;
 }
 
-.playerRightSide > * + * {
+.mainStats > * + * {
     margin-left: 2rem;
 }
 
@@ -283,3 +284,22 @@
 .collapseIcon svg {
     color: var(--grey500);
 }
+
+.additionalStats {
+    color: var(--grey600);
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+}
+
+.additionalStats > div {
+    width: 3.5rem;
+}
+
+.additionalStatIcon > svg {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.2rem;
+    color: var(--grey500);
+    margin-top: -0.1rem;
+}
+

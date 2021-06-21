@@ -1,5 +1,5 @@
 from SqliteLib import *
-from typing import Optional
+from typing import DefaultDict, Optional
 from datetime import datetime, timedelta
 
 PLAYER_TABLE = DatedTable("player")
@@ -64,6 +64,38 @@ def MatchExists(cursor: SqliteDB, matchId) -> bool:
         {MATCH_MATCHID_COL: matchId}
     ))
 
+TEAM_TABLE = DatedTable("team")
+
+TEAM_TABLE.CreateForeignKey(MATCH_MATCHID_COL, isPrimary=True)
+TEAM_ISREDSIDE_COL = TEAM_TABLE.CreateColumn("isRedSide", BOOL_TYPE, isPrimary=True)
+TEAM_DRAGONS_COL = TEAM_TABLE.CreateColumn("dragons", INTEGER_TYPE)
+TEAM_BARONS_COL = TEAM_TABLE.CreateColumn("barons", INTEGER_TYPE)
+TEAM_TOWERS_COL = TEAM_TABLE.CreateColumn("towers", INTEGER_TYPE)
+TEAM_INHIBS_COL = TEAM_TABLE.CreateColumn("inhibs", INTEGER_TYPE)
+TEAM_BAN_COLS = [TEAM_TABLE.CreateColumn(f"ban{i}", VarCharType(20)) for i in range(5)]
+
+def AddTeam(
+        cursor: SqliteDB, 
+        matchId: int, 
+        isRedSide: bool, 
+        dragons: int,
+        barons: int,
+        towers: int,
+        inhibs: int,
+        bans: str
+    ):
+        cursor.InsertIntoTable(
+            TEAM_TABLE, {
+                MATCH_MATCHID_COL: [matchId],
+                TEAM_ISREDSIDE_COL: [isRedSide],
+                TEAM_DRAGONS_COL: [dragons],
+                TEAM_BARONS_COL: [barons],
+                TEAM_TOWERS_COL: [towers],
+                TEAM_INHIBS_COL: [inhibs],
+                **{TEAM_BAN_COLS[i]: [bans[i] if i<len(bans) else ""] for i in range(5)}
+            }
+        )
+
 
 TEAMPLAYER_TABLE = DatedTable("teamPlayer")
 
@@ -75,7 +107,33 @@ TEAMPLAYER_ISREDSIDE_COL = TEAMPLAYER_TABLE.CreateColumn("isRedSide", BOOL_TYPE)
 TEAMPLAYER_KILLS_COL = TEAMPLAYER_TABLE.CreateColumn("kills", INTEGER_TYPE)
 TEAMPLAYER_DEATHS_COL = TEAMPLAYER_TABLE.CreateColumn("deaths", INTEGER_TYPE)
 TEAMPLAYER_ASSISTS_COL = TEAMPLAYER_TABLE.CreateColumn("assists", INTEGER_TYPE)
-TEAMPLAYER_CSMIN_COL = TEAMPLAYER_TABLE.CreateColumn("csMin", FLOAT_TYPE)
+TEAMPLAYER_CS_COL = TEAMPLAYER_TABLE.CreateColumn("cs", INTEGER_TYPE)
+
+TEAMPLAYER_DOULBES_COL = TEAMPLAYER_TABLE.CreateColumn("doubles", INTEGER_TYPE)
+TEAMPLAYER_TRIPLES_COL = TEAMPLAYER_TABLE.CreateColumn("triples", INTEGER_TYPE)
+TEAMPLAYER_QUADRAS_COL = TEAMPLAYER_TABLE.CreateColumn("quadras", INTEGER_TYPE)
+TEAMPLAYER_PENTAS_COL = TEAMPLAYER_TABLE.CreateColumn("pentas", INTEGER_TYPE)
+
+TEAMPLAYER_KP_COL = TEAMPLAYER_TABLE.CreateColumn("kp", INTEGER_TYPE)
+TEAMPLAYER_DMGDEALT_COL = TEAMPLAYER_TABLE.CreateColumn("dmgDealt", INTEGER_TYPE)
+TEAMPLAYER_DMGTAKEN_COL = TEAMPLAYER_TABLE.CreateColumn("dmgTaken", INTEGER_TYPE)
+TEAMPLAYER_GOLD_COL = TEAMPLAYER_TABLE.CreateColumn("gold", INTEGER_TYPE)
+
+TEAMPLAYER_SPELL1 = TEAMPLAYER_TABLE.CreateColumn("spell1", VarCharType(20))
+TEAMPLAYER_SPELL2 = TEAMPLAYER_TABLE.CreateColumn("spell2", VarCharType(20))
+
+TEAMPLAYER_ITEMS = [TEAMPLAYER_TABLE.CreateColumn(f"item{i}", INTEGER_TYPE) for i in range(7)]
+
+TEAMPLAYER_PERK1 = TEAMPLAYER_TABLE.CreateColumn("perk1", INTEGER_TYPE)
+TEAMPLAYER_PERK2 = TEAMPLAYER_TABLE.CreateColumn("perk2", INTEGER_TYPE)
+
+TEAMPLAYER_HEALING_COL = TEAMPLAYER_TABLE.CreateColumn("healing", INTEGER_TYPE)
+TEAMPLAYER_VISION_COL = TEAMPLAYER_TABLE.CreateColumn("vision", INTEGER_TYPE)
+TEAMPLAYER_CCTIME_COL = TEAMPLAYER_TABLE.CreateColumn("ccTime", INTEGER_TYPE)
+TEAMPLAYER_FIRSTBLOOD_COL = TEAMPLAYER_TABLE.CreateColumn("firstBlood", BOOL_TYPE)
+TEAMPLAYER_TURRETS_COL = TEAMPLAYER_TABLE.CreateColumn("turrets", INTEGER_TYPE)
+TEAMPLAYER_INHIBS_COL = TEAMPLAYER_TABLE.CreateColumn("inhibs", INTEGER_TYPE)
+
 
 def AddTeamPlayer(
     cursor: SqliteDB, 
@@ -87,7 +145,32 @@ def AddTeamPlayer(
     kills: int,
     deaths: int,
     assists: int,
-    csMin: float
+    cs: int,
+
+    doubles: int,
+    triples: int,
+    quadras: int,
+    pentas: int,
+
+    kp: int, # this is technically redundant, but it's easier for querying
+    dmgDealt: int,
+    dmgTaken: int,
+    gold: int,
+
+    spell1: int,
+    spell2: int,
+
+    perk1: int,
+    perk2: int,
+
+    healing: int,
+    vision: int,
+    ccTime: int,
+    firstBlood: int,
+    turrets: int,
+    inhibs: int,
+
+    items: int
 ):
     cursor.InsertIntoTable(
         TEAMPLAYER_TABLE, {
@@ -99,7 +182,32 @@ def AddTeamPlayer(
             TEAMPLAYER_KILLS_COL: [kills],
             TEAMPLAYER_DEATHS_COL: [deaths],
             TEAMPLAYER_ASSISTS_COL: [assists],
-            TEAMPLAYER_CSMIN_COL: [csMin]
+            TEAMPLAYER_CS_COL: [cs],
+
+            TEAMPLAYER_DOULBES_COL: [doubles],
+            TEAMPLAYER_TRIPLES_COL: [triples],
+            TEAMPLAYER_QUADRAS_COL: [quadras],
+            TEAMPLAYER_PENTAS_COL: [pentas],
+
+            TEAMPLAYER_KP_COL: [kp],
+            TEAMPLAYER_DMGDEALT_COL: [dmgDealt],
+            TEAMPLAYER_DMGTAKEN_COL: [dmgTaken],
+            TEAMPLAYER_GOLD_COL: [gold],
+
+            TEAMPLAYER_SPELL1: [spell1],
+            TEAMPLAYER_SPELL2: [spell2],
+
+            **{TEAMPLAYER_ITEMS[i]:[items[i]] for i in range(7)},
+
+            TEAMPLAYER_PERK1: [perk1],
+            TEAMPLAYER_PERK2: [perk2],
+
+            TEAMPLAYER_HEALING_COL: [healing],
+            TEAMPLAYER_VISION_COL: [vision],
+            TEAMPLAYER_CCTIME_COL: [ccTime],
+            TEAMPLAYER_FIRSTBLOOD_COL: [firstBlood],
+            TEAMPLAYER_TURRETS_COL: [turrets],
+            TEAMPLAYER_INHIBS_COL: [inhibs],
         }
     )
 
@@ -114,5 +222,5 @@ def GetMostRecentGame(cursor: SqliteDB, accountId: int):
 if __name__ == "__main__":
     WriteSchema(
         "schema.sql",
-        [PLAYER_TABLE, MATCH_TABLE, TEAMPLAYER_TABLE]
+        [PLAYER_TABLE, MATCH_TABLE, TEAM_TABLE, TEAMPLAYER_TABLE]
     )

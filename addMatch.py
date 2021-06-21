@@ -38,6 +38,44 @@ def makeRequest(query: str, level = 0):
             return makeRequest(query, level + 1)
     return res.json()
 
+CHAMPS_ID_TO_NAME = {}
+CHAMPS_JSON_URL = "http://ddragon.leagueoflegends.com/cdn/11.12.1/data/en_US/champion.json"
+
+def UpdateChampsIdToName():
+    global CHAMPS_ID_TO_NAME
+
+    champsJson = makeRequest(CHAMPS_JSON_URL)["data"]
+    CHAMPS_ID_TO_NAME = {int(v["key"]): k for k,v in champsJson.items()}
+    
+def GetChamp(id: int) -> str:
+    if id in CHAMPS_ID_TO_NAME:
+        return CHAMPS_ID_TO_NAME[id]
+    else:
+        UpdateChampsIdToName()
+        if id not in CHAMPS_ID_TO_NAME:
+            raise Exception(f"champion id: '{id}' invalid.")
+        return CHAMPS_ID_TO_NAME[id]
+
+SUMMONERS_ID_TO_NAME = {}
+SUMONERS_JSON_URL = "http://ddragon.leagueoflegends.com/cdn/11.12.1/data/en_US/summoner.json"
+
+def UpdateSummonersIdToName():
+    global SUMMONERS_ID_TO_NAME
+    
+    summonersJson = makeRequest(SUMONERS_JSON_URL)["data"]
+    SUMMONERS_ID_TO_NAME = {int(v["key"]): k for k,v in summonersJson.items()}
+
+def GetSummoner(id: int) -> str:
+    if id in SUMMONERS_ID_TO_NAME:
+        return SUMMONERS_ID_TO_NAME[id]
+    else:
+        UpdateSummonersIdToName()
+        if id not in SUMMONERS_ID_TO_NAME:
+            raise Exception(f"summoner id: '{id}' invalid.")
+
+def text(soup):
+    return soup.text.strip() 
+
 def getIcon(summonerName, region):
     try:
         iconUrl = f"https://{region.lower()}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summonerName}?api_key={API_KEY}"
@@ -53,39 +91,111 @@ def decodeUtf8(s):
     except:
         return s
 
-def addPlayer(cursor, playerContainer, isRedSide, matchId, gameLength, date, region):
+def getChampionToAccIdAndName(soup: BeautifulSoup):
+    championToAccIdAndName = {}
 
-    champion = playerContainer.select('.champion-icon > div')[0]['data-rg-id']
-    playerLink = playerContainer.select('.champion-nameplate-name > div > a')[0]
-    name = decodeUtf8(text(playerLink))
-    accountId = playerLink['href'].split('/')[-1]
+    teams = soup.select(f".team.team-{RED_SIDE},.team.team-{BLUE_SIDE}")
+    for teamContainer in teams:
 
-    cs = text(playerContainer.select('.minions-col > div')[0])
-    csMin = int(cs) / (gameLength / 60)
+        for playerContainer in teamContainer.select('li'):
+            champion = playerContainer.select('.champion-icon > div')[0]['data-rg-id']
+            playerLink = playerContainer.select('.champion-nameplate-name > div > a')[0]
+            name = decodeUtf8(text(playerLink))
+            accountId = playerLink['href'].split('/')[-1]
 
-    k,d,a = [text(x) for x in playerContainer.select('.kda-kda > div')]
+            championToAccIdAndName[champion] = {
+                PLAYER_ACCOUNTID_COL.name: accountId,
+                PLAYER_SUMMONERNAME_COL.name: name
+            }
+    return championToAccIdAndName
 
-    if not PlayerExits(cursor, accountId):
-        start = time.time()
-        AddPlayer(cursor, accountId, name, getIcon(name, region))
-        print("Time Elasped:", f"{time.time() - start:.2f}")
-    elif GetSummonerName(cursor, accountId) != name: # name has changed
-        if GetMostRecentGame(cursor, accountId) < date: # must call this before AddTeamPlayer
-            UpdatePlayer(cursor, accountId, name, getIcon(name, region))
+def addTeam(cursor, riotData):
+    matchId = riotData['gameId']
 
-    AddTeamPlayer(
-        cursor, 
-        matchId, 
-        accountId, 
-        champion, 
-        isRedSide, 
-        k, d, a, 
-        csMin
-    )
-    print('\t', name, accountId, isRedSide, csMin, k, d, a)
+    for team in riotData["teams"]:
+        team["bans"].sort(key=lambda b: b["pickTurn"])
+        bans = [CHAMPS_ID_TO_NAME[b["championId"]] for b in team["bans"]]
 
-def text(soup):
-    return soup.text.strip() 
+        AddTeam(
+            cursor,
+            matchId=matchId,
+            isRedSide = int(team["teamId"]) == RED_SIDE,
+            dragons=team["dragonKills"],
+            barons=team["baronKills"],
+            towers=team["towerKills"],
+            inhibs=team["inhibitorKills"],
+            bans=bans
+        )
+
+def addPlayers(cursor, riotData, championToAccIdAndName):
+    matchId = riotData['gameId']
+    date = riotData['gameDuration']
+    region = riotData['platformId']
+
+    teamIdToKills = {}
+    for participant in riotData['participants']:
+        teamId = participant["teamId"]
+        cummKills = teamIdToKills.get(teamId, 0)
+        kills = participant["stats"]["kills"]
+        teamIdToKills[teamId] = cummKills + kills
+
+    for participant in riotData['participants']:
+        champion = GetChamp(participant["championId"])
+        accountId = championToAccIdAndName[champion][PLAYER_ACCOUNTID_COL.name]
+        name = championToAccIdAndName[champion][PLAYER_SUMMONERNAME_COL.name]
+        isRedSide = participant["teamId"] == RED_SIDE
+
+        if not PlayerExits(cursor, accountId):
+            start = time.time()
+            AddPlayer(cursor, accountId, name, getIcon(name, region))
+            print("Time Elasped:", f"{time.time() - start:.2f}")
+
+        elif GetSummonerName(cursor, accountId) != name: # name has changed
+            if GetMostRecentGame(cursor, accountId) < date: # must call this before AddTeamPlayer
+                UpdatePlayer(cursor, accountId, name, getIcon(name, region))
+
+        stats = participant["stats"]
+
+        kills, assists = stats["kills"], stats["assists"]
+        kp = (kills + assists) / teamIdToKills[participant["teamId"]] * 100
+
+        AddTeamPlayer(
+            cursor,
+            matchId=matchId,
+            accountId=accountId,
+            isRedSide=isRedSide,
+            champion=champion,
+
+            kills=kills,
+            deaths=stats["deaths"],
+            assists=stats["assists"],
+            cs=stats["totalMinionsKilled"]+stats["neutralMinionsKilled"],
+
+            doubles=stats["doubleKills"],
+            triples=stats["tripleKills"],
+            quadras=stats["quadraKills"],
+            pentas=stats["pentaKills"],
+
+            perk1=stats["perkPrimaryStyle"],
+            perk2=stats["perkSubStyle"],
+
+            kp=kp,
+            dmgDealt=stats["totalDamageDealtToChampions"],
+            dmgTaken=stats["totalDamageTaken"],
+            gold=stats["goldEarned"],
+
+            spell1=participant["spell1Id"],
+            spell2=participant["spell2Id"],
+
+            healing=stats["totalHeal"],
+            vision=stats["visionScore"],
+            ccTime=stats["timeCCingOthers"],
+            firstBlood=stats["firstBloodKill"],
+            turrets=stats["turretKills"],
+            inhibs=stats["inhibitorKills"],
+
+            items=[stats[f"item{i}"] for i in range(7)]
+        )
 
 def addMatch(cursor, html):
 
@@ -144,22 +254,16 @@ def addMatch(cursor, html):
         f"Only classic are allowed, this game is of type '{riotRes['gameMode']}'"
     )
 
+    gameLength = riotRes["gameDuration"]
 
-    gameLengthStr = text(soup.select('.player-header-duration > div')[0])
-    m,s = [int(x) for x in gameLengthStr.strip().split(':')]
-    gameLength = timedelta(minutes=m, seconds=s).total_seconds()
-
-    redSideWon = None
+    redTeam = [t for t in riotRes["teams"] if t["teamId"] == RED_SIDE][0]
+    redSideWon = redTeam["win"] == "Win"
 
     teams = soup.select(f".team.team-{RED_SIDE},.team.team-{BLUE_SIDE}")
     assert(teams is not None)
-    for teamContainer in teams:
-        isRedSide = f'team-{RED_SIDE}' in teamContainer['class']
-        teamWon = text(teamContainer.select('.game-conclusion')[0]) == WIN_STR
-        redSideWon = redSideWon or (isRedSide == teamWon)
 
-        for playerContainer in teamContainer.select('li'):
-            addPlayer(cursor, playerContainer, isRedSide, matchId, gameLength, date, region)
+    addPlayers(cursor, riotRes, getChampionToAccIdAndName(soup))
+    addTeam(cursor, riotRes)
 
     AddMatch(cursor, matchId, redSideWon, gameLength, date)
 
