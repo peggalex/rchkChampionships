@@ -4,28 +4,46 @@ import { GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI, NumericComp
 import "./Players.css";
 import Icons from './Icons';
 
+const winRateSort = {
+    name: 'win rate', 
+    sort: NumericCompareFunc((p: IPlayer) =>  p.allAvgs.wins / p.allAvgs.noGames),
+    desc: true
+};
+
+const kdaSort = {
+    name: 'kda', 
+    sort: NumericCompareFunc((p: IPlayer) => 
+        (p.allAvgs.avgKills + p.allAvgs.avgAssists) / p.allAvgs.avgDeaths
+    ),
+    desc: true
+};
 
 const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
-    {
-        name: 'winrate', 
-        sort: NumericCompareFunc((p: IPlayer) =>  p.allAvgs.wins / p.allAvgs.noGames),
-        desc: true
-    },
-    {
-        name: 'kda', 
-        sort: NumericCompareFunc((p: IPlayer) => 
-            (p.allAvgs.avgKills + p.allAvgs.avgAssists) / p.allAvgs.avgDeaths
-        ),
-        desc: true
-    },
+    winRateSort,
+    kdaSort,
     {
         name: "cs",
         sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgCs),
         desc: true
     },
     {
-        name: 'games', 
-        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.noGames),
+        name: "kp",
+        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgKp),
+        desc: true
+    },
+    {
+        name: "dmg dealt",
+        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgDmgDealt),
+        desc: true
+    },
+    {
+        name: "dmg taken",
+        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgDmgTaken),
+        desc: true
+    },
+    {
+        name: 'gold', 
+        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgGold),
         desc: true
     },
     {
@@ -42,6 +60,11 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
             return NumericCompareFunc((x: string) => x.length)(aName, bName);
         },
         desc: false
+    },
+    {
+        name: 'champs played',
+        sort: NumericCompareFunc((p: IPlayer) => p.championAvgs.length),
+        desc: true
     }
 ];
 
@@ -273,7 +296,9 @@ function Players(): JSX.Element {
     const [players, setPlayers] = React.useState([] as IPlayer[]);
 
     function setPlayersSorted(oldPlayers: IPlayer[]){
-        let newPlayers = [...oldPlayers].sort(sort.sort);
+        let newPlayers = [...oldPlayers].sort((a,b) => 
+            sort.sort(a,b) || winRateSort.sort(a,b) || kdaSort.sort(a,b)
+        );
         if (sort.desc) newPlayers.reverse();
         setPlayers(newPlayers);
     }

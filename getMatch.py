@@ -81,8 +81,12 @@ def getPlayerStats(cursor):
     avgColumnsPerMin = [TEAMPLAYER_CS_COL, TEAMPLAYER_DMGDEALT_COL, TEAMPLAYER_DMGTAKEN_COL, TEAMPLAYER_GOLD_COL]
 
     colToAvgName = lambda c: f"avg{c.name[0].upper() + c.name[1:]}"
+
     winsName = "wins"
     countName = "noGames"
+
+    winsQuery = f"SUM(CASE WHEN {MATCH_REDSIDEWON_COL.name} = {TEAMPLAYER_ISREDSIDE_COL.name} THEN 1 ELSE 0 END)"
+    kdaQuery = f"(AVG({TEAMPLAYER_KILLS_COL.name}) + AVG({TEAMPLAYER_ASSISTS_COL.name})) / AVG({TEAMPLAYER_DEATHS_COL.name})"
 
     avgPlayerChampStatQuery = f"""
         SELECT 
@@ -90,7 +94,7 @@ def getPlayerStats(cursor):
             {TEAMPLAYER_CHAMPION_COL.name},
             {PLAYER_SUMMONERNAME_COL.name},
             {PLAYER_ICONID_COL.name},
-            SUM(CASE WHEN {MATCH_REDSIDEWON_COL.name} = {TEAMPLAYER_ISREDSIDE_COL.name} THEN 1 ELSE 0 END) AS {winsName},
+            {winsQuery} AS {winsName},
             COUNT(*) AS {countName},
             {','.join((f'AVG({c.name}) AS {colToAvgName(c)}' for c in avgColumns))},
             {','.join((f'AVG(({c.name}*60.0)/{MATCH_LENGTH_COL.name}) AS {colToAvgName(c)}' for c in avgColumnsPerMin))}
@@ -99,7 +103,12 @@ def getPlayerStats(cursor):
                 JOIN {PLAYER_TABLE.name} p ON tp.{PLAYER_ACCOUNTID_COL.name} = p.{PLAYER_ACCOUNTID_COL.name}
                 JOIN {MATCH_TABLE.name} m ON tp.{MATCH_MATCHID_COL.name} = m.{MATCH_MATCHID_COL.name}
         GROUP BY p.{PLAYER_ACCOUNTID_COL.name}, {TEAMPLAYER_CHAMPION_COL.name}
-        ORDER BY {PLAYER_SUMMONERNAME_COL.name}, COUNT(*) DESC
+        ORDER BY 
+            {PLAYER_SUMMONERNAME_COL.name}, 
+            COUNT(*) DESC, 
+            AVG({TEAMPLAYER_DEATHS_COL.name}) = 0 DESC,
+            {winsQuery} DESC, 
+            {kdaQuery} DESC
     """
 
     avgPlayerChampStats = cursor.FetchAll(avgPlayerChampStatQuery)

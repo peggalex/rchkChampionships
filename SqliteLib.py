@@ -164,8 +164,8 @@ class DatedTable(Table):
 
 class SqliteDB():
     
-    def __init__(self):
-        self.connection = sqlite3.connect(DB_FILENAME)
+    def __init__(self, dbName = None):
+        self.connection = sqlite3.connect(dbName or DB_FILENAME)
         self.connection.isolation_level = None
         self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()

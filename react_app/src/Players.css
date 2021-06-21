@@ -129,11 +129,20 @@
 .champion {
     background-color: transparent;
     height: 4rem;
+    padding: 0.5rem 0;
+}
+
+.champion .additionalStats {
+    margin-top: 0.5rem;
 }
 
 .champion .mainStat {
     font-size: 1.5rem;
     text-align: end;
+}
+
+.champion .winRateTotal {
+    width: 5.25rem;
 }
 
 .champion .totalKda {
@@ -291,6 +300,11 @@
     margin-top: 0.75rem;
 }
 
+.additionalStats {
+    width: 26.5rem;
+    align-self: flex-end;
+}
+
 .additionalStats > div {
     width: 3.5rem;
 }
@@ -301,5 +315,6 @@
     margin-right: 0.2rem;
     color: var(--grey500);
     margin-top: -0.1rem;
+    stroke-width: 2.5;
 }
 

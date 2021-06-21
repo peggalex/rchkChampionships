@@ -259,9 +259,6 @@ def addMatch(cursor, html):
     redTeam = [t for t in riotRes["teams"] if t["teamId"] == RED_SIDE][0]
     redSideWon = redTeam["win"] == "Win"
 
-    teams = soup.select(f".team.team-{RED_SIDE},.team.team-{BLUE_SIDE}")
-    assert(teams is not None)
-
     addPlayers(cursor, riotRes, getChampionToAccIdAndName(soup))
     addTeam(cursor, riotRes)
 
