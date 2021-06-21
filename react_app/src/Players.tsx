@@ -111,7 +111,7 @@ function WinRate({wins, games, isMini}: {wins: number, games: number, isMini: bo
 }
 
 function KDAStat({k, d, a, isMini}: {k: number, d: number, a: number, isMini: boolean}){
-    let totalKda = d == 0 ?  "∞" : ((k + a)/d).toFixed(isMini ? 1 : 2);
+    let totalKda = d == 0 ?  "∞ " : ((k + a)/d).toFixed(isMini ? 1 : 2);
 
     return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"}`}>
         <span className="totalKda mainStat">
