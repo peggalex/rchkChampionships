@@ -159,6 +159,18 @@ button:disabled{
   background-color: white !important;
 }
 
+.loaderContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 3rem 0;
+}
+
+.loaderContainer .loader {
+  --loaderDiameter: 3rem;
+}
+
 @keyframes slideIn {
   from { 
     padding-top: 6rem; 

@@ -291,6 +291,7 @@ function PlayerChampion(
     </div>
 }
 
+var PLAYERS_ARE_LOADED = false;
 var PLAYERS: IPlayer[] = [];
 
 function Players(): JSX.Element {
@@ -307,21 +308,19 @@ function Players(): JSX.Element {
             sort.sort(a,b) || winRateSort.sort(a,b) || kdaSort.sort(a,b)
         );
         if (sort.desc) newPlayers.reverse();
-        console.log(`new players: ${newPlayers.length}`)
         setPlayers(newPlayers);
     }
 
     async function getPlayers(){
-        if (PLAYERS.length == 0){
+        if (!PLAYERS_ARE_LOADED){
             let res = await CallAPI("/getPlayerStats", RestfulType.GET);
             PLAYERS = res["res"];
+            PLAYERS_ARE_LOADED = true;
         }
-        console.log("calling setPlayersSorted from getPlayers")
         setPlayersSorted(PLAYERS);
     }
 
     React.useEffect(() => {
-        console.log("calling setPlayersSorted from sort effect")
         setPlayersSorted(players);
     }, [sort]);
 
@@ -368,10 +367,11 @@ function Players(): JSX.Element {
             </div>
         </div>
         <div>
-            {
+            {PLAYERS_ARE_LOADED ?
                 players
                     .filter(p => p.name.toLowerCase().startsWith(search?.toLowerCase()))
-                    .map((p, i) => <Player player={p} key={i}/>)
+                    .map((p, i) => <Player player={p} key={i}/>) :
+                <div className="loaderContainer"><div className="loader"></div></div>
             }
         </div>
     </div>;

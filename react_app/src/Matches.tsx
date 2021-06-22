@@ -148,7 +148,6 @@ function Match(
 }
 
 
-
 function Team(
     {team: {
         isRedSide,
@@ -238,6 +237,7 @@ function SortOption({label, onClick, isSelected}: {label: string, onClick: () =>
     </div>;
 }
 
+var MATCHES_ARE_LOADED = false;
 var MATCHES: IMatch[] = [];
 var PLAYERS_AGGREGATE: IPlayerAggregate[] = [];
 
@@ -320,10 +320,11 @@ function Matches(): JSX.Element {
             document.querySelector("#main")?.scrollIntoView({ behavior: 'smooth', block: 'start'});
         }
 
-        if (MATCHES.length == 0){
+        if (!MATCHES_ARE_LOADED){
             let res = await CallAPI("/getMatches", RestfulType.GET);
             MATCHES = res["res"] as IMatch[];
             PLAYERS_AGGREGATE = getPlayers(MATCHES);
+            MATCHES_ARE_LOADED = true;
         }
 
         let selectedPlayer;
@@ -413,11 +414,11 @@ function Matches(): JSX.Element {
             </div>
             <div className="spacer"></div>
         </div>
-        <div>
-            {MATCHES.map((m: IMatch, i) => 
+        <div className="col center">
+            {MATCHES_ARE_LOADED ? MATCHES.map((m: IMatch, i) => 
                 MatchContainsPlayerAndChampion(m, state.playerFilter.val?.accountId, state.championFilter.val) ?
                     <Match match={m} key={i}/> : null
-            )}
+            ) : <div className="loaderContainer"><div className="loader"></div></div>}
         </div>
     </div>
 }
