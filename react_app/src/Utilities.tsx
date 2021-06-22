@@ -17,7 +17,6 @@ export enum CompareType {
 export type CompareFunc = (a: any, b: any) => CompareType;
 
 export const CompareNumbers = (aNum: number, bNum: number): CompareType => {
-    console.log("inCompareNums", "aNum", aNum, "bNum", bNum);
     if (aNum == bNum) return CompareType.same;
     return aNum < bNum ? CompareType.inOrder : CompareType.outOfOrder;
 }

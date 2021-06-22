@@ -147,6 +147,8 @@ function Match(
     </div>
 }
 
+
+
 function Team(
     {team: {
         isRedSide,
@@ -195,15 +197,13 @@ interface IFilter<T> {
 }
 
 type MatchActions = 
-    "init" 
+    "setPlayerAndChampionFilter" 
     | "setPlayerFilter" 
     | "togglePlayerFilter" 
     | "setChampionFilter" 
     | "toggleChampionFilter";
 
 type TMatchState = {
-    matches: IMatch[],
-    players: IPlayerAggregate[], 
     playerFilter: IFilter<IPlayerAggregate>, 
     championFilter: IFilter<string>
 };
@@ -238,6 +238,9 @@ function SortOption({label, onClick, isSelected}: {label: string, onClick: () =>
     </div>;
 }
 
+var MATCHES: IMatch[] = [];
+var PLAYERS_AGGREGATE: IPlayerAggregate[] = [];
+
 function Matches(): JSX.Element {
 
     let { accId, champion } = useParams() as { accId?: string, champion?: string};
@@ -245,38 +248,22 @@ function Matches(): JSX.Element {
 
     const [state, dispatch] = React.useReducer((state: TMatchState, {type, payload}: {type: MatchActions, payload?: TMatchState}) => {
         switch (type){
-            case "init":
-                let players = getPlayers(payload!.matches);
-
-                let selectedPlayer;
-                if (accountId !== undefined) {
-                    for (let player of players){
-                        if (player.accountId == accountId){
-                            selectedPlayer = player;
-                        }
-                    }
-                }
-
-                let isValidChampion = champion !== undefined && selectedPlayer?.champions.includes(champion);
-
+            case "setPlayerAndChampionFilter":
                 return {
-                    matches: payload!.matches,
-                    players: players,
                     playerFilter: {
-                        expanded: false, 
-                        val: selectedPlayer
-                    }, 
-                    championFilter: 
-                        {
-                            expanded: false,
-                            val: isValidChampion ? champion : undefined
-                        }
-                    };
+                        val: payload!.playerFilter.val,
+                        expanded: false
+                    },
+                    championFilter: {
+                        val: payload!.championFilter.val,
+                        expanded: false
+                    }
+                };
+
             case "setPlayerFilter":
                 let [oldPlayer, newPlayer] = [state.playerFilter.val, payload!.playerFilter.val];
                 
                 return oldPlayer?.accountId == newPlayer?.accountId ? state : {
-                    ...state,
                     playerFilter: {
                         expanded: false, // close when selected
                         val: newPlayer
@@ -288,7 +275,6 @@ function Matches(): JSX.Element {
                 };
             case "togglePlayerFilter":
                 return {
-                    ...state,
                     playerFilter: {
                         ...state.playerFilter,
                         expanded: !state.playerFilter.expanded
@@ -300,19 +286,17 @@ function Matches(): JSX.Element {
                 };
             case "setChampionFilter":
                 return {
-                    ...state,
                     playerFilter: {
                         ...state.playerFilter,
                         expanded: false
                     },
                     championFilter: {
+                        val: payload!.championFilter.val,
                         expanded: false, // close when selected
-                        val: payload!.championFilter.val
                     }
                 };
                 case "toggleChampionFilter":
                     return {
-                        ...state,
                         playerFilter: {
                             ...state.playerFilter,
                             expanded: false,
@@ -327,18 +311,40 @@ function Matches(): JSX.Element {
         }
         
     }, {
-        matches: [] as IMatch[], 
-        players: [] as IPlayerAggregate[], 
         playerFilter: {expanded: false}, 
         championFilter: {expanded: false}
 } as TMatchState);
 
     async function getMatches(){
-        let res = await CallAPI("/getMatches", RestfulType.GET);
-        dispatch({type: "init", payload: {...state, matches: res["res"] as IMatch[]}});
         if (accountId !== undefined){
             document.querySelector("#main")?.scrollIntoView({ behavior: 'smooth', block: 'start'});
         }
+
+        if (MATCHES.length == 0){
+            let res = await CallAPI("/getMatches", RestfulType.GET);
+            MATCHES = res["res"] as IMatch[];
+            PLAYERS_AGGREGATE = getPlayers(MATCHES);
+        }
+
+        let selectedPlayer;
+        if (accountId !== undefined) {
+            for (let player of PLAYERS_AGGREGATE){
+                if (player.accountId == accountId){
+                    selectedPlayer = player;
+                }
+            }
+        }
+
+        let isValidChampion = champion !== undefined && selectedPlayer?.champions.includes(champion);
+        
+        dispatch({
+            type: "setChampionFilter", 
+            payload: {
+                ...state, 
+                playerFilter: {...state.championFilter, val: selectedPlayer},
+                championFilter: {...state.championFilter, val: isValidChampion ? champion : undefined}
+            }
+        })
     }
 
     React.useEffect(() => {
@@ -362,7 +368,7 @@ function Matches(): JSX.Element {
                             })}
                             isSelected={state.playerFilter.val === undefined}
                         />
-                        {state.players.map((p, i) => 
+                        {PLAYERS_AGGREGATE.map((p, i) => 
                             <SortOption label={p.summonerName} onClick={() => dispatch({
                                     type: "setPlayerFilter", 
                                     payload: {...state, playerFilter: {...state.playerFilter, val: p}}
@@ -408,7 +414,7 @@ function Matches(): JSX.Element {
             <div className="spacer"></div>
         </div>
         <div>
-            {state.matches.map((m: IMatch, i) => 
+            {MATCHES.map((m: IMatch, i) => 
                 MatchContainsPlayerAndChampion(m, state.playerFilter.val?.accountId, state.championFilter.val) ?
                     <Match match={m} key={i}/> : null
             )}

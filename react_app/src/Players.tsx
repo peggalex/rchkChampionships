@@ -65,6 +65,11 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
         name: 'champs played',
         sort: NumericCompareFunc((p: IPlayer) => p.championAvgs.length),
         desc: true
+    },
+    {
+        name: 'games played',
+        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.noGames),
+        desc: true
     }
 ];
 
@@ -286,6 +291,8 @@ function PlayerChampion(
     </div>
 }
 
+var PLAYERS: IPlayer[] = [];
+
 function Players(): JSX.Element {
 
     const [search, setSearch] = React.useState("");
@@ -300,21 +307,27 @@ function Players(): JSX.Element {
             sort.sort(a,b) || winRateSort.sort(a,b) || kdaSort.sort(a,b)
         );
         if (sort.desc) newPlayers.reverse();
+        console.log(`new players: ${newPlayers.length}`)
         setPlayers(newPlayers);
     }
 
     async function getPlayers(){
-        let res = await CallAPI("/getPlayerStats", RestfulType.GET);
-        setPlayersSorted(res["res"]);
+        if (PLAYERS.length == 0){
+            let res = await CallAPI("/getPlayerStats", RestfulType.GET);
+            PLAYERS = res["res"];
+        }
+        console.log("calling setPlayersSorted from getPlayers")
+        setPlayersSorted(PLAYERS);
     }
+
+    React.useEffect(() => {
+        console.log("calling setPlayersSorted from sort effect")
+        setPlayersSorted(players);
+    }, [sort]);
 
     React.useEffect(() => {
         getPlayers();
     }, []);
-
-    React.useEffect(() => {
-        setPlayersSorted(players);
-    }, [sort]);
 
     return <div id="playersContainer">
         <div id="playerTopBar" className="row centerCross">
