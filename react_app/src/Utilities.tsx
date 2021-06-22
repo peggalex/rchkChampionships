@@ -55,8 +55,7 @@ export async function CallAPI(
     headers: any = {}
 ): Promise<any> {
 	url = url.replace(/[ \t\n]/g, ''); // get rid of empty spaces and newlines
-    //var fullUrl = `${process.env.PUBLIC_URL}/${url}`; //uncomment for prod
-    var fullUrl = `http://localhost:3000/${url}`;
+    var fullUrl = `${process.env.PUBLIC_URL || './'}/${url}`;
 	return new Promise(async (resolve, reject) => {
         fetch(fullUrl, {
             method: RestfulType[method],
@@ -89,4 +88,15 @@ export const CallAPIJson = async (
 export const GetPlayerElementId = (accountId: number): string => `player${accountId}`;
 
 export const GetChampIconUrl = (champ: string): string => `http://ddragon.leagueoflegends.com/cdn/11.11.1/img/champion/${champ}.png`;
-export const GetChampDisplayName = (champ: string): string => champ.replace(/([A-Z])/g, (m) => ` ${m}`).trim();
+export const GetChampDisplayName = (champ: string): string => {
+    switch(champ){
+        case "MonkeyKing":
+            return "Wukong";
+        default:
+            return champ.replace(/([^A-Z])([A-Z])/g, (_, lower, upper) => `${lower} ${upper}`);
+    }
+}
+
+export const GetItemIconUrl = (iconId: number): string => `https://ddragon.leagueoflegends.com/cdn/11.12.1/img/item/${iconId}.png`;
+export const GetSpellIconUrl = (spellName: string): string => `https://ddragon.leagueoflegends.com/cdn/11.10.1/img/spell/${spellName}.png`;
+export const GetKeystoneIconUrl = (partialUrl: string): string => `https://ddragon.leagueoflegends.com/cdn/img/${partialUrl}`;

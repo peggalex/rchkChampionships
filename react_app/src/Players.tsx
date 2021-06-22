@@ -110,7 +110,7 @@ function WinRate({wins, games, isMini}: {wins: number, games: number, isMini: bo
     </div>
 }
 
-function KDAStat({k, d, a, isMini}: {k: number, d: number, a: number, isMini: boolean}){
+export function KDAStat({k, d, a, isMini}: {k: number, d: number, a: number, isMini: boolean}){
     let totalKda = d == 0 ?  "∞ " : ((k + a)/d).toFixed(isMini ? 1 : 2);
 
     return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"}`}>
@@ -125,13 +125,13 @@ function KDAStat({k, d, a, isMini}: {k: number, d: number, a: number, isMini: bo
     </div>
 }
 
-function CreepScore({cs, isMini}: {cs: number, isMini: boolean}){
+export function CreepScore({cs, isMini}: {cs: number, isMini: boolean}){
     return <span className={`csMin mainStat ${isMini ? "mini" : "large"}`}>
         {cs.toFixed(1)}
     </span>
 }
 
-function AdditionalStats({
+export function AdditionalStats({
             kp, 
             dmgDealt, 
             dmgTaken, 

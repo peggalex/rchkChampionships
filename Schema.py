@@ -119,13 +119,12 @@ TEAMPLAYER_DMGDEALT_COL = TEAMPLAYER_TABLE.CreateColumn("dmgDealt", INTEGER_TYPE
 TEAMPLAYER_DMGTAKEN_COL = TEAMPLAYER_TABLE.CreateColumn("dmgTaken", INTEGER_TYPE)
 TEAMPLAYER_GOLD_COL = TEAMPLAYER_TABLE.CreateColumn("gold", INTEGER_TYPE)
 
-TEAMPLAYER_SPELL1 = TEAMPLAYER_TABLE.CreateColumn("spell1", VarCharType(20))
-TEAMPLAYER_SPELL2 = TEAMPLAYER_TABLE.CreateColumn("spell2", VarCharType(20))
+TEAMPLAYER_SPELL1_COL = TEAMPLAYER_TABLE.CreateColumn("spell1", VarCharType(30))
+TEAMPLAYER_SPELL2_COL = TEAMPLAYER_TABLE.CreateColumn("spell2", VarCharType(30))
 
-TEAMPLAYER_ITEMS = [TEAMPLAYER_TABLE.CreateColumn(f"item{i}", INTEGER_TYPE) for i in range(7)]
+TEAMPLAYER_ITEM_COLS = [TEAMPLAYER_TABLE.CreateColumn(f"item{i}", INTEGER_TYPE) for i in range(7)]
 
-TEAMPLAYER_PERK1 = TEAMPLAYER_TABLE.CreateColumn("perk1", INTEGER_TYPE)
-TEAMPLAYER_PERK2 = TEAMPLAYER_TABLE.CreateColumn("perk2", INTEGER_TYPE)
+TEAMPLAYER_KEYSTONEURL_COL = TEAMPLAYER_TABLE.CreateColumn("keyStoneUrl", VarCharType(100))
 
 TEAMPLAYER_HEALING_COL = TEAMPLAYER_TABLE.CreateColumn("healing", INTEGER_TYPE)
 TEAMPLAYER_VISION_COL = TEAMPLAYER_TABLE.CreateColumn("vision", INTEGER_TYPE)
@@ -160,8 +159,7 @@ def AddTeamPlayer(
     spell1: int,
     spell2: int,
 
-    perk1: int,
-    perk2: int,
+    keyStoneUrl: str,
 
     healing: int,
     vision: int,
@@ -194,13 +192,12 @@ def AddTeamPlayer(
             TEAMPLAYER_DMGTAKEN_COL: [dmgTaken],
             TEAMPLAYER_GOLD_COL: [gold],
 
-            TEAMPLAYER_SPELL1: [spell1],
-            TEAMPLAYER_SPELL2: [spell2],
+            TEAMPLAYER_SPELL1_COL: [spell1],
+            TEAMPLAYER_SPELL2_COL: [spell2],
 
-            **{TEAMPLAYER_ITEMS[i]:[items[i]] for i in range(7)},
+            **{TEAMPLAYER_ITEM_COLS[i]:[items[i]] for i in range(7)},
 
-            TEAMPLAYER_PERK1: [perk1],
-            TEAMPLAYER_PERK2: [perk2],
+            TEAMPLAYER_KEYSTONEURL_COL: [keyStoneUrl],
 
             TEAMPLAYER_HEALING_COL: [healing],
             TEAMPLAYER_VISION_COL: [vision],

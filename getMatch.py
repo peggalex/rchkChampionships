@@ -1,77 +1,32 @@
-import json
 from Schema import *
 from SqliteLib import *
 from serverUtilities import assertGoodRequest 
 
-def getMatches(cursor, accountId = None, champion = None):
+def getMatches(cursor):
 
-    assertGoodRequest(
-        champion is None or accountId is not None, 
-        "Champion may only be specified if player is specified."
-    )
+    matches = list(reversed(cursor.FetchAll(cursor.Q(
+        [], 
+        MATCH_TABLE, 
+        orderBys=[MATCH_DATE_COL]
+    ))))
 
-    whereClause = ""
-    if accountId is not None:
-        whereClause = f"""
-            WHERE '{accountId}' IN (
-                SELECT {PLAYER_ACCOUNTID_COL.name} 
-                FROM {TEAMPLAYER_TABLE.name} tp
-                WHERE tp.{MATCH_MATCHID_COL.name} = m.{MATCH_MATCHID_COL.name}
-                    {f"AND tp.{TEAMPLAYER_CHAMPION_COL.name} = '{champion}'" if champion is not None else ""}
-            )
-        """
+    for match in matches:
+        matchId = match[MATCH_MATCHID_COL.name]
 
-    cols = [
-        MATCH_DATE_COL, 
-        MATCH_REDSIDEWON_COL, 
-        PLAYER_SUMMONERNAME_COL,
-        TEAMPLAYER_CHAMPION_COL, 
-        TEAMPLAYER_ISREDSIDE_COL
-    ]
-
-    teamPlayers = cursor.FetchAll(f"""
-        SELECT 
-            m.{MATCH_MATCHID_COL.name},
-            p.{PLAYER_ACCOUNTID_COL.name},
-            {",".join([c.name for c in cols])}
-        FROM {MATCH_TABLE.name} m 
-            JOIN {TEAMPLAYER_TABLE.name} tp ON m.{MATCH_MATCHID_COL.name} = tp.{MATCH_MATCHID_COL.name}
-            JOIN {PLAYER_TABLE.name} p ON tp.{PLAYER_ACCOUNTID_COL.name} = p.{PLAYER_ACCOUNTID_COL.name}
-        {whereClause}
-        ORDER BY {MATCH_DATE_COL.name} DESC, m.{MATCH_MATCHID_COL.name} DESC, {TEAMPLAYER_ISREDSIDE_COL.name}
-    """)
-
-    matches = []
-    for matchOffset in range(0, len(teamPlayers), 10):
-
-        firstPlayer = teamPlayers[matchOffset] # first match player
-
-        match = {
-            "matchId": firstPlayer[MATCH_MATCHID_COL.name],
-            "date": firstPlayer[MATCH_DATE_COL.name],
-            "redSideWon": firstPlayer[MATCH_REDSIDEWON_COL.name],
-            "teams": []
-        }
-        for teamOffset in range(0, 10, 5):
-            players = []
-            team = {
-                "isRedSide": bool(teamOffset//5), 
-                "players": players
-            }
-            for playerOffset in range(5):
-                teamPlayer = teamPlayers[matchOffset + teamOffset + playerOffset]
-
-                assert teamPlayer[TEAMPLAYER_ISREDSIDE_COL.name] == team["isRedSide"]
-                assert teamPlayer[MATCH_MATCHID_COL.name] == match["matchId"]
-
-                team["players"].append({
-                    "champion": teamPlayer[TEAMPLAYER_CHAMPION_COL.name],
-                    "accountId": teamPlayer[PLAYER_ACCOUNTID_COL.name],
-                    "name": teamPlayer[PLAYER_SUMMONERNAME_COL.name]
-                })
-            match["teams"].append(team)
-
-        matches.append(match)
+        for isRedSide in [False, True]:
+            team = cursor.FetchAll(cursor.Q([], TEAM_TABLE, {
+                MATCH_MATCHID_COL: matchId,
+                TEAM_ISREDSIDE_COL: isRedSide
+            }))[0]
+            team['players'] = cursor.FetchAll(f""" 
+                SELECT * 
+                FROM {TEAMPLAYER_TABLE.name} tp JOIN {PLAYER_TABLE.name} p
+                    ON tp.{PLAYER_ACCOUNTID_COL.name} = p.{PLAYER_ACCOUNTID_COL.name}
+                WHERE {MATCH_MATCHID_COL.name} = {matchId}
+                    AND {TEAMPLAYER_ISREDSIDE_COL.name} = {isRedSide}
+            """)
+            team['kills'] = sum(p[TEAMPLAYER_KILLS_COL.name] for p in team['players'])
+            match["redSide" if isRedSide else "blueSide"] = team
 
     return matches
 

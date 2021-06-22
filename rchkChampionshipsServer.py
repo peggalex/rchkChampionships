@@ -88,13 +88,11 @@ def addMatchHTMLEndpoint():
 
 
 @app.route('/getMatches', methods=['GET'])
-@app.route('/getMatches/<summonerId>', methods=['GET'])
-@app.route('/getMatches/<summonerId>/champion/<champion>', methods=['GET'])
-def getMatchesEndpoint(summonerId = None, champion = None):
+def getMatchesEndpoint():
 
     with SqliteDB() as cursor:
         try:
-            return {"res": getMatches(cursor, summonerId, champion)}, 200
+            return {"res": getMatches(cursor)}, 200
         except Exception as e:
             return handleException(cursor, e)
 

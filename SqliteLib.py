@@ -186,7 +186,7 @@ class SqliteDB():
         table.CheckColumns(set(columns) | set(columnValues.keys()))
 
         query = f"""
-            SELECT {', '.join((c.name for c in columns))}
+            SELECT {', '.join((c.name for c in columns)) if columns else "*"}
             FROM {table.name}
         """
         if columnValues:

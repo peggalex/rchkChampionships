@@ -48,13 +48,11 @@ def UpdateChampsIdToName():
     CHAMPS_ID_TO_NAME = {int(v["key"]): k for k,v in champsJson.items()}
     
 def GetChamp(id: int) -> str:
-    if id in CHAMPS_ID_TO_NAME:
-        return CHAMPS_ID_TO_NAME[id]
-    else:
+    if id not in CHAMPS_ID_TO_NAME:
         UpdateChampsIdToName()
         if id not in CHAMPS_ID_TO_NAME:
             raise Exception(f"champion id: '{id}' invalid.")
-        return CHAMPS_ID_TO_NAME[id]
+    return CHAMPS_ID_TO_NAME[id]
 
 SUMMONERS_ID_TO_NAME = {}
 SUMONERS_JSON_URL = "http://ddragon.leagueoflegends.com/cdn/11.12.1/data/en_US/summoner.json"
@@ -66,12 +64,32 @@ def UpdateSummonersIdToName():
     SUMMONERS_ID_TO_NAME = {int(v["key"]): k for k,v in summonersJson.items()}
 
 def GetSummoner(id: int) -> str:
-    if id in SUMMONERS_ID_TO_NAME:
-        return SUMMONERS_ID_TO_NAME[id]
-    else:
+    if id not in SUMMONERS_ID_TO_NAME:
         UpdateSummonersIdToName()
         if id not in SUMMONERS_ID_TO_NAME:
             raise Exception(f"summoner id: '{id}' invalid.")
+    return SUMMONERS_ID_TO_NAME[id]
+
+
+KEYSTONE_ID_TO_URL = {}
+PERK_LIST_URL = "http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/runesReforged.json"
+# thank you so much to stackoverflow question 64043232
+
+def UpdateKeystoneIdToName():
+    global KEYSTONE_ID_TO_URL
+    
+    perks = makeRequest(PERK_LIST_URL)
+    for p in perks:
+        for keystone in p['slots'][0]['runes']:
+            KEYSTONE_ID_TO_URL[keystone['id']] = keystone['icon']
+
+def GetKeystone(id: int) -> str:
+    if id not in KEYSTONE_ID_TO_URL:
+        UpdateKeystoneIdToName()
+        if id not in KEYSTONE_ID_TO_URL:
+            raise Exception(f"keystone id: '{id}' invalid.")
+    return KEYSTONE_ID_TO_URL[id]
+
 
 def text(soup):
     return soup.text.strip() 
@@ -176,16 +194,15 @@ def addPlayers(cursor, riotData, championToAccIdAndName):
             quadras=stats["quadraKills"],
             pentas=stats["pentaKills"],
 
-            perk1=stats["perkPrimaryStyle"],
-            perk2=stats["perkSubStyle"],
+            spell1=GetSummoner(participant["spell1Id"]),
+            spell2=GetSummoner(participant["spell2Id"]),
 
             kp=kp,
             dmgDealt=stats["totalDamageDealtToChampions"],
             dmgTaken=stats["totalDamageTaken"],
             gold=stats["goldEarned"],
 
-            spell1=participant["spell1Id"],
-            spell2=participant["spell2Id"],
+            keyStoneUrl=GetKeystone(stats["perk0"]),
 
             healing=stats["totalHeal"],
             vision=stats["visionScore"],

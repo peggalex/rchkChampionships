@@ -1,43 +1,83 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect, useParams, useHistory } from 'react-router-dom';
-import { EnumArray, GetChampIconUrl, RestfulType, CallAPI } from './Utilities';
+import { EnumArray, GetChampIconUrl, RestfulType, CallAPI, GetItemIconUrl, GetSpellIconUrl, GetKeystoneIconUrl } from './Utilities';
 import "./Matches.css";
 import Icons from './Icons';
-
-enum PlayerSort {
-    winrate,
-    kda,
-    games,
-    name
-}
+import Players, { AdditionalStats, KDAStat } from './Players';
 
 interface IPlayer {
-    name: string,
+    summonerName: string,
     accountId: number,
 }
 
 interface IPlayerAggregate extends IPlayer {
-    name: string,
+    summonerName: string,
     accountId: number,
     champions: string[],
 }
 
 interface ITeamPlayer extends IPlayer {
-    name: string,
+    summonerName: string,
     accountId: number,
     champion: string,
+	kills: number,
+	deaths: number,
+	assists: number,
+	cs: number,
+
+	doubles: number,
+	triples: number,
+	quadras: number,
+	pentas: number,
+
+	kp: number,
+	dmgDealt: number,
+	dmgTaken: number,
+	gold: number,
+
+	spell1: string,
+	spell2: string,
+
+	item0: number,
+	item1: number,
+	item2: number,
+	item3: number,
+	item4: number,
+	item5: number,
+	item6: number,
+
+	keyStoneUrl: string,
+
+	healing: number,
+	vision: number,
+	ccTime: number,
+	firstBlood: boolean,
+	turrets: number,
+	inhibs: number
 }
 
 interface ITeam {
     isRedSide: boolean,
+    kills: number,
+    dragons: number,
+    barons: number,
+    towers: number,
+    inhibs: number,
+    ban0: string,
+    ban1: string,
+    ban2: string,
+    ban3: string,
+    ban4: string
     players: ITeamPlayer[]
 };
 
 interface IMatch {
     matchId: number,
     date: number,
+    length: number
     redSideWon: boolean,
-    teams: ITeam[]
+    redSide: ITeam,
+    blueSide: ITeam
 };
 
 function getDaySuffix(day: number){
@@ -50,12 +90,29 @@ function getDaySuffix(day: number){
     }
 }
 
+function Spells({spell1, spell2}: {spell1: string, spell2: string}){
+    return <div className="spells col">
+        {[spell1, spell2].map((s, i) => <img className="spell" src={GetSpellIconUrl(s)} key={i}/>)}
+    </div>
+}
+
+function Items({items}: {items: number[]}): JSX.Element {
+    return <div className={"items"}>{
+        items.map((id, i) => 
+            id !== 0 ? 
+                <img className="item" src={GetItemIconUrl(id)} key={i} loading="lazy"/> : 
+                <span className="item noItem"/>
+        )
+    }</div>
+}
+
 function Match(
     {match: {
         matchId, 
         date, 
         redSideWon, 
-        teams
+        redSide,
+        blueSide
     }}:
     {match: IMatch}
 ): JSX.Element {
@@ -84,7 +141,7 @@ function Match(
             <a className="matchHistory centerAll" href={matchLink} target="_blank">{Icons.Link}</a>
         </div>
         {isExpanded ? <div className="teamsContainer row">
-            {teams.map((t, i) => <Team team={t} redSideWon={redSideWon} key={i}/>)}
+            {[redSide, blueSide].map((t, i) => <Team team={t} redSideWon={redSideWon} key={i}/>)}
             <div className="teamsShadow accordionShadow"></div>
         </div> : null}
     </div>
@@ -106,16 +163,26 @@ function Team(
     </div>
 }
 
-function TeamPlayer({player: {accountId, champion, name}}: {player: ITeamPlayer}): JSX.Element {
+function TeamPlayer({player}: {player: ITeamPlayer}): JSX.Element {
+
     const history = useHistory();
-    return <div className="teamPlayer row centerCross">
-        <img className="teamPlayerChampionIcon circle" src={GetChampIconUrl(champion)}/>
-        <p onClick={()=>history.push(`/players/${accountId}`)} className="clickable">{name}</p>
+    return <div className="teamPlayer col">
+        <div className="row centerCross">
+            <Spells spell1={player.spell1} spell2={player.spell2}/>
+            <img className="teamPlayerChampionIcon circle" src={GetChampIconUrl(player.champion)}/>
+            <img className="keyStone" src={GetKeystoneIconUrl(player.keyStoneUrl)}/>
+            <p onClick={()=>history.push(`/players/${player.accountId}`)} className="clickable">{player.summonerName}</p>
+            <Items items={Array.from(Array(6)).map((_, i) => (player as any)[`item${i}`])}/>
+        </div>
+        <div className="row centerCross">
+            <KDAStat k={player.kills} d={player.deaths} a={player.assists} isMini={true}/>
+            <AdditionalStats kp={player.kp} dmgDealt={player.dmgDealt} dmgTaken={player.dmgTaken} gold={player.gold} isPerMin={false}/>
+        </div>
     </div>
 }
 
 const MatchContainsPlayerAndChampion = (match: IMatch, accountId?: number, champion?: string):boolean => {    
-    return accountId === undefined || match.teams.some(t => 
+    return accountId === undefined || [match.redSide, match.blueSide].some(t => 
         t.players.some(p => 
             p.accountId == accountId && (champion === undefined || p.champion == champion)
         )
@@ -144,7 +211,7 @@ type TMatchState = {
 function getPlayers(matches: IMatch[]): IPlayerAggregate[]{
     let accIdToTeamPlayer = {} as {[index: number]: ITeamPlayer[]};
     for (let m of matches){
-        for (let t of m.teams){
+        for (let t of [m.redSide, m.blueSide]){
             for (let p of t.players){
                 let existing = accIdToTeamPlayer[p.accountId] || [];
                 existing.push(p);
@@ -156,7 +223,7 @@ function getPlayers(matches: IMatch[]): IPlayerAggregate[]{
     return Object.entries(accIdToTeamPlayer).map(([accId, players]) => {
         return {
             accountId: parseInt(accId), 
-            name: players[0].name,
+            summonerName: players[0].summonerName,
             champions: Array.from(new Set(players.map((p) => p.champion))).sort()
         } as IPlayerAggregate;
     }); // reshape this list of team players into a single player with a list of champions
@@ -285,7 +352,7 @@ function Matches(): JSX.Element {
                     className="playerSort clickable" 
                     onClick={() => dispatch({type: "togglePlayerFilter"})}
                 >
-                    {state.playerFilter.val === undefined ? "any player" : state.playerFilter.val!.name}
+                    {state.playerFilter.val === undefined ? "any player" : state.playerFilter.val!.summonerName}
                 </button>
                 {state.playerFilter.expanded ? 
                     <div className="playerSortSelection col">
@@ -296,7 +363,7 @@ function Matches(): JSX.Element {
                             isSelected={state.playerFilter.val === undefined}
                         />
                         {state.players.map((p, i) => 
-                            <SortOption label={p.name} onClick={() => dispatch({
+                            <SortOption label={p.summonerName} onClick={() => dispatch({
                                     type: "setPlayerFilter", 
                                     payload: {...state, playerFilter: {...state.playerFilter, val: p}}
                                 })}
