@@ -5,7 +5,7 @@ import "./Players.css";
 import Icons from './Icons';
 
 const winRateSort = {
-    name: 'win rate', 
+    name: 'winrate', 
     sort: NumericCompareFunc((p: IPlayer) =>  p.allAvgs.wins / p.allAvgs.noGames),
     desc: true
 };
