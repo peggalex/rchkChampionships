@@ -337,12 +337,10 @@ function Matches(): JSX.Element {
         }
 
         let isValidChampion = champion !== undefined && selectedPlayer?.champions.includes(champion);
-        
         dispatch({
-            type: "setChampionFilter", 
+            type: "setPlayerAndChampionFilter", 
             payload: {
-                ...state, 
-                playerFilter: {...state.championFilter, val: selectedPlayer},
+                playerFilter: {...state.playerFilter, val: selectedPlayer},
                 championFilter: {...state.championFilter, val: isValidChampion ? champion : undefined}
             }
         })
