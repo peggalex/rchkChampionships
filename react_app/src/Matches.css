@@ -159,7 +159,7 @@
     transform: scale(0.75);
 }
 
-.additionalStats {
+.teamPlayer .additionalStats {
     font-size: 0.5rem;
     width: 12.5rem;
     margin-left: auto;
