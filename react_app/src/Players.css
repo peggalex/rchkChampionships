@@ -128,8 +128,12 @@
 
 .champion {
     background-color: transparent;
-    height: 4rem;
-    padding: 0.5rem 0;
+    height: 6rem;
+    position: relative;
+}
+
+.champion + .champion {
+    border-top: solid var(--grey300) 0.1rem;
 }
 
 .champion .additionalStats {
@@ -317,4 +321,18 @@
     margin-top: -0.1rem;
     stroke-width: 2.5;
 }
+/*
+.champion:not(:hover) .additionalStats {
+    display: none;
+}
 
+.champion:hover .playerRightSide > *:not(.additionalStats) {
+    display: none;
+}
+*/
+.champion .additionalStats {
+    /* margin-top: 2rem; */
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.5rem;
+}

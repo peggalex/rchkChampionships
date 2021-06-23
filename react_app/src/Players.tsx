@@ -286,8 +286,8 @@ function PlayerChampion(
                 <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} isMini={true}/>
                 <CreepScore cs={avgCs} isMini={true}/>
             </div>
-            <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
         </div>
+        <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
     </div>
 }
 

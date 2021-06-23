@@ -118,6 +118,10 @@ footer {
   border-radius: calc(var(--radius)/2);
 }
 
+.fullLength {
+  width: 100%;
+}
+
 .loader {
   --loaderDiameter: 120px;
   border: calc(var(--loaderDiameter) / 5) solid var(--grey200);
