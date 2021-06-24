@@ -321,15 +321,11 @@ function PersonChampion(
 ): JSX.Element {
 
     // champion is in pascal case
-    const history = useHistory();
 
     return <div className="champion row centerCross">
         <div className="playerLeftSide row centerCross">
         <img className="championIcon circle" src={GetChampIconUrl(champion)}/>
-            <h2 
-                onClick={() => history.push(`/matches/${accountId}/champion/${champion}`)} 
-                className="champName clickable"
-            >{GetChampDisplayName(champion)}</h2>
+            <h2 className="champName">{GetChampDisplayName(champion)}</h2>
         </div>
         <div className="playerRightSide col">
             <div className="row centerCross">
