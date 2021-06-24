@@ -47,9 +47,9 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
         desc: true
     },
     {
-        name: 'name', 
+        name: 'name',
         sort: (a: IPerson, b: IPerson) => {
-            let [aName, bName] = [a.summonerName, b.summonerName];
+            let [aName, bName] = [a.personName, b.personName];
 
             let shorterNameLen = Math.min(aName.length, bName.length);
             for (let i = 0; i < shorterNameLen; i++){
