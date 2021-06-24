@@ -187,7 +187,6 @@ function EditPersonName({accountId, name, setIsLoading, goBack}: {accountId: num
     const nameRef = React.useRef(null as HTMLInputElement|null);
     const [canSubmit, setCanSubmit] = React.useState(false);
     const [personName, setPersonName] = React.useState(name || "");
-    const history = useHistory();
 
     function trySubmitPerson(e: any){
         e.stopPropagation();
@@ -208,7 +207,7 @@ function EditPersonName({accountId, name, setIsLoading, goBack}: {accountId: num
         CallAPI(`/setAccountPersonName/${accountId}/personName/${personName}`, RestfulType.POST)
         .then(() => {
             if (window.confirm(`Successfully changed name to '${personName}', reload page?`)){
-                window.location.href = `./players/${accountId}`;
+                window.location.href = `/${process.env.PUBLIC_URL}/players/${accountId}`;
             }
         }).catch((res)=>{
             console.log("res", res);
