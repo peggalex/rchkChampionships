@@ -208,7 +208,7 @@ function EditPersonName({accountId, name, setIsLoading, goBack}: {accountId: num
         CallAPI(`/setAccountPersonName/${accountId}/personName/${personName}`, RestfulType.POST)
         .then(() => {
             if (window.confirm(`Successfully changed name to '${personName}', reload page?`)){
-                history.push(`/players/${accountId}`)
+                window.location.href = `/players/${accountId}`;
             }
         }).catch((res)=>{
             console.log("res", res);
