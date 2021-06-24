@@ -173,3 +173,17 @@
     font-size: 1rem;
     margin-right: -0.35rem;
 }
+
+p.matchIndex {
+    font-weight: 200;
+    width: 1.5rem;
+    text-align: right;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+    padding-top: 0.35rem;
+    color: var(--grey800);
+}
+
+p.matchIndex:after {
+    content: ".";
+}

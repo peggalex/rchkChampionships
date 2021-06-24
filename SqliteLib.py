@@ -59,12 +59,14 @@ class Column:
         isPrimary: bool = False, 
         table: 'Table' = None,
         foreignKey: "Column?" = None,
+        isNotNull: bool = True
     ):
         self.name = name
         self.dataType = dataType
         self.table = table
         self.isPrimary = isPrimary
         self.foreignKey = foreignKey
+        self.isNotNull = isNotNull
         self.check = f"CHECK({self.name} IN {str(dataType.enum)})" if dataType.enum else ""
 
         self.dtype = (name, dataType.numpyType)
@@ -73,10 +75,10 @@ class Column:
         return self if self.foreignKey is None else self.foreignKey.Source()
 
     def __repr__(self) -> str:
-        return f'{self.name} {self.dataType.sqliteName} {self.check} NOT NULL'
+        return f'{self.name} {self.dataType.sqliteName} {self.check}{" NOT NULL" if self.isNotNull else ""}'
 
-    def GetForeignKey(self, table: 'Table', isPrimary: bool = False) -> 'Column':
-        return Column(self.name, self.dataType, isPrimary=isPrimary, foreignKey=self)
+    def GetForeignKey(self, table: 'Table', isPrimary: bool = False, isNotNull: bool = True) -> 'Column':
+        return Column(self.name, self.dataType, isPrimary=isPrimary, table=table, foreignKey=self, isNotNull=isNotNull)
 
     def GetForeignKeyStr(self) -> str:
         if self.foreignKey is None: raise ValueError("foreignKey is None")
@@ -135,14 +137,15 @@ class Table:
         name: str, 
         dataType: DataType, 
         isPrimary: bool = False, 
-        foreignKey: Column = None
+        foreignKey: Column = None,
+        isNotNull: bool = True,
     ) -> Column:
-        col = Column(name, dataType, isPrimary, self, foreignKey)
+        col = Column(name, dataType, isPrimary, self, foreignKey, isNotNull)
         self.AddColumn(col)
         return col
 
-    def CreateForeignKey(self, col: Column, isPrimary: bool = False) -> Column:
-        col = col.GetForeignKey(self, isPrimary)
+    def CreateForeignKey(self, col: Column, isPrimary: bool = False, isNotNull: bool = True) -> Column:
+        col = col.GetForeignKey(self, isPrimary, isNotNull)
         return self.AddColumn(col)
 
 class DatedTable(Table):

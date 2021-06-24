@@ -1,18 +1,18 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect, useHistory, useParams } from 'react-router-dom';
 import { GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI, NumericCompareFunc, CompareNumbers, CompareType, CompareFunc, GetPlayerElementId, GetProfileIconUrl } from './Utilities';
-import "./Players.css";
+import "./People.css";
 import Icons from './Icons';
 
 const winRateSort = {
     name: 'winrate', 
-    sort: NumericCompareFunc((p: IPlayer) =>  p.allAvgs.wins / p.allAvgs.noGames),
+    sort: NumericCompareFunc((p: IPerson) =>  p.allAvgs.wins / p.allAvgs.noGames),
     desc: true
 };
 
 const kdaSort = {
     name: 'kda', 
-    sort: NumericCompareFunc((p: IPlayer) => 
+    sort: NumericCompareFunc((p: IPerson) => 
         (p.allAvgs.avgKills + p.allAvgs.avgAssists) / p.allAvgs.avgDeaths
     ),
     desc: true
@@ -23,32 +23,32 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
     kdaSort,
     {
         name: "cs",
-        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgCs),
+        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.avgCs),
         desc: true
     },
     {
         name: "kp",
-        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgKp),
+        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.avgKp),
         desc: true
     },
     {
         name: "dmg dealt",
-        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgDmgDealt),
+        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.avgDmgDealt),
         desc: true
     },
     {
         name: "dmg taken",
-        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgDmgTaken),
+        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.avgDmgTaken),
         desc: true
     },
     {
         name: 'gold', 
-        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.avgGold),
+        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.avgGold),
         desc: true
     },
     {
         name: 'name', 
-        sort: (a: IPlayer, b: IPlayer) => {
+        sort: (a: IPerson, b: IPerson) => {
             let [aName, bName] = [a.summonerName, b.summonerName];
 
             let shorterNameLen = Math.min(aName.length, bName.length);
@@ -63,12 +63,12 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
     },
     {
         name: 'champs played',
-        sort: NumericCompareFunc((p: IPlayer) => p.championAvgs.length),
+        sort: NumericCompareFunc((p: IPerson) => p.championAvgs.length),
         desc: true
     },
     {
         name: 'games played',
-        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.noGames),
+        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.noGames),
         desc: true
     }
 ];
@@ -90,13 +90,12 @@ interface IChampionAvg extends IAvg {
     champion: string
 }
 
-interface IPlayer {
+interface IPerson {
     [x: string]: any;
-    summonerName: string,
-    accountId: number,
-    iconId: number,
     allAvgs: IAvg,
-    personName: string|null,
+    person: string,
+    iconId: number,
+    accounts: {[accountId: number]: string},
     championAvgs: IChampionAvg[]
 }
 
@@ -183,96 +182,62 @@ export function AdditionalStats({
     </div>
 }
 
-function EditPersonName({accountId, name, setIsLoading, goBack}: {accountId: number, name: string|null, setIsLoading: (isLoading: boolean) => void, goBack: () => void}){
-    const nameRef = React.useRef(null as HTMLInputElement|null);
-    const [canSubmit, setCanSubmit] = React.useState(false);
-    const [personName, setPersonName] = React.useState(name || "");
-    const history = useHistory();
 
-    function trySubmitPerson(e: any){
-        e.stopPropagation();
+async function getAvgColorStr(src: string){
+    let rgb = await get_average_rgb(src);
+    return `rgb(${rgb.join(',')})`;
+}
 
-        let nameEl = nameRef.current!;
-        if (personName === "") {
-            nameEl.setCustomValidity("Please enter a name");
-            return nameEl.reportValidity();
-        } else {
-            nameEl.setCustomValidity("");
-        }
+async function get_average_rgb(src: string): Promise<Uint8ClampedArray> {
+    /* https://stackoverflow.com/questions/2541481/get-average-color-of-image-via-javascript */
+    return new Promise(resolve => {
+        let context = document.createElement('canvas').getContext('2d');
+        context!.imageSmoothingEnabled = true;
 
-        if (personName === name){
-            return goBack();
-        }
+        let img = new Image;
+        img.src = src;
+        img.crossOrigin = "";
 
-        setIsLoading(true);
-        CallAPI(`/setAccountPersonName/${accountId}/personName/${personName}`, RestfulType.POST)
-        .then(() => {
-            if (window.confirm(`Successfully changed name to '${personName}', reload page?`)){
-                history.push(`/players/${accountId}`)
-            }
-        }).catch((res)=>{
-            console.log("res", res);
-            alert(res["error"]);
-        }).finally(()=>{
-            setIsLoading(false);
-        });
-    }
+        img.onload = () => {
+            context!.drawImage(img, 0, 0, 1, 1);
+            resolve(context!.getImageData(0, 0, 1, 1).data.slice(0,3));
+        };
+    });
+}
 
+function PersonIcon({iconId}: {iconId: number}){
+    let [personColorStr, setPersonColorStr] = React.useState("white");
     React.useEffect(() => {
-        setCanSubmit(personName !== "");
-    }, [personName])
-
-    return <div className="editPersonName row centerCross">
-        <input 
-            pattern="[\dA-Za-z ]{1,16}" 
-            maxLength={16}
-            title="Alphanumeric and spaces (up to 16 characters)" 
-            ref={nameRef} 
-            value={personName} 
-            onClick={(e: any) => e.stopPropagation()}
-            autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
-            onChange={() => setPersonName(nameRef.current!.value)}
-        />
-        <div 
-            className={`clickable submitPersonName centerAll ${canSubmit ? "canSubmit" : ""}`} 
-            onClick={trySubmitPerson}
-        >{Icons.Tick}</div>
+        getAvgColorStr(GetProfileIconUrl(iconId)).then(
+            (color) => setPersonColorStr(color)
+        );
+    }, []);
+    return <div 
+        className="personPic centerAll profilePic circle" 
+        style={{backgroundColor: personColorStr}}
+    >
+        {Icons.User}
     </div>
 }
 
-function Names({accountId, summonerName, personName, setIsLoading}: {accountId: number, summonerName: string, personName: string|null, setIsLoading: (isLoading: boolean) => void}){
+function Names({personName, accounts}: {personName: string, accounts: {[accountId: number]: string}}){
     const history = useHistory();
 
-    const [isEditMode, setIsEditMode] = React.useState(personName == null);
-    let goBack = () => setIsEditMode(false);
-
     return <div className="summonerNameContainer">
-        <h2>{summonerName}</h2>
-        <div className="underSummonerName">{!isEditMode ?                 
-            <div className="personNameDone row centerCross">
-                <p 
-                    onClick={()=>history.push(`/people/${personName}`)} 
-                    className="clickable blueTextHover"
-                >{personName}</p>
-                <div 
-                    onClick={(e) => {e.stopPropagation(); setIsEditMode(true);}} 
-                    className="editNameContainer blueTextHover centerAll"
-                >{Icons.Edit}</div>
-            </div> : <EditPersonName 
-                accountId={accountId} 
-                name={personName} 
-                setIsLoading={setIsLoading} 
-                goBack={goBack}
-            />
+        <h2>{personName}</h2>
+        <div className="underSummonerName personAccountLink row">{
+            Object.entries(accounts).map(([accId, name], i) => 
+                <p onClick={()=>history.push(`/players/${accId}`)} className="clickable blueTextHover">{name}</p>            
+            )
         }</div>
     </div>
 }
 
-function Player(
-    {player: {
-        summonerName, 
+function Person(
+    {person: {
         iconId, 
         accountId,
+        personName,
         allAvgs: {
             avgKills, 
             avgDeaths, 
@@ -285,18 +250,18 @@ function Player(
             wins,
             noGames
         }, 
-        personName,
+        accounts,
         championAvgs
-    }, setIsLoading}:
-    {player: IPlayer, setIsLoading: (isLoading: boolean) => void}
+    }}:
+    {person: IPerson}
 ): JSX.Element {
 
-    let { accId } = useParams() as { accId?: string };
-    let isSelected = accountId.toString() === accId; // use params will return a string
+    let { selectedPersonName } = useParams() as { selectedPersonName?: string };
+    let isSelected = personName === selectedPersonName; // use params will return a string
 
     const elRef = React.useRef(null as HTMLDivElement|null);
 
-    let playerElementId = GetPlayerElementId(accountId);
+    let personElementId = GetPlayerElementId(accountId);
 
     const [isExpanded, setIsExpanded] = React.useState(isSelected);
 
@@ -306,7 +271,8 @@ function Player(
         }
     }, []);
 
-    return <div id={playerElementId} ref={elRef}>
+
+    return <div id={personElementId} ref={elRef}>
         <div 
             className={`player whiteWhenHovered row centerCross clickable ${isExpanded ? "expanded" : ""}`} 
             onClick={() => setIsExpanded(!isExpanded)}
@@ -314,8 +280,8 @@ function Player(
             <div className="collapseIcon">
                 {isExpanded ? Icons.ChevronUp : Icons.ChevronDown}
             </div>
-            <img className="profilePic circle" src={GetProfileIconUrl(iconId)}/>
-            <Names accountId={accountId} summonerName={summonerName} personName={personName} setIsLoading={setIsLoading}/>
+            <PersonIcon iconId={iconId}/>
+            <Names personName={personName} accounts={accounts}/>
             <div className="playerRightSide col">
                 <div className="mainStats row centerCross">
                     <WinRate wins={wins} games={noGames} isMini={false}/>
@@ -326,7 +292,7 @@ function Player(
             </div>
         </div>
         {isExpanded ? <div className="championAvgsContainer accordionShadow">
-                {championAvgs.map((c, i) => <PlayerChampion 
+                {championAvgs.map((c, i) => <PersonChampion 
                     championAvg={c} 
                     accountId={accountId} 
                     key={i}
@@ -337,7 +303,7 @@ function Player(
 }
 
 
-function PlayerChampion(
+function PersonChampion(
     {championAvg: {
         champion,
         avgKills, 
@@ -359,10 +325,10 @@ function PlayerChampion(
 
     return <div className="champion row centerCross">
         <div className="playerLeftSide row centerCross">
-            <img className="championIcon circle" src={GetChampIconUrl(champion)}/>
+        <img className="championIcon circle" src={GetChampIconUrl(champion)}/>
             <h2 
                 onClick={() => history.push(`/matches/${accountId}/champion/${champion}`)} 
-                className="champName clickable blueTextHover"
+                className="champName clickable"
             >{GetChampDisplayName(champion)}</h2>
         </div>
         <div className="playerRightSide col">
@@ -377,38 +343,36 @@ function PlayerChampion(
 }
 
 var PLAYERS_ARE_LOADED = false;
-var PLAYERS: IPlayer[] = [];
+var PLAYERS: IPerson[] = [];
 
-function Players(): JSX.Element {
+function People(): JSX.Element {
 
     const [search, setSearch] = React.useState("");
 
     const [sort, setSort] = React.useState(PlayerSort[0]);
     const [showFilterSelection, setShowFilterSelection] = React.useState(false);
 
-    const [isLoading, setIsLoading] = React.useState(true);
-    const [players, setPlayers] = React.useState([] as IPlayer[]);
+    const [people, setPeople] = React.useState([] as IPerson[]);
 
-    function setPlayersSorted(oldPlayers: IPlayer[]){
-        let newPlayers = [...oldPlayers].sort((a,b) => 
+    function setPlayersSorted(oldPeople: IPerson[]){
+        let newPeople = [...oldPeople].sort((a,b) => 
             sort.sort(a,b) || winRateSort.sort(a,b) || kdaSort.sort(a,b)
         );
-        if (sort.desc) newPlayers.reverse();
-        setPlayers(newPlayers);
+        if (sort.desc) newPeople.reverse();
+        setPeople(newPeople);
     }
 
     async function getPlayers(){
         if (!PLAYERS_ARE_LOADED){
-            let res = await CallAPI("/getPlayerStats", RestfulType.GET);
+            let res = await CallAPI("/getPersonStats", RestfulType.GET);
             PLAYERS = res["res"];
+            PLAYERS_ARE_LOADED = true;
         }
-        console.log('setting isloading to false');
-        setIsLoading(false);
         setPlayersSorted(PLAYERS);
     }
 
     React.useEffect(() => {
-        setPlayersSorted(players);
+        setPlayersSorted(people);
     }, [sort]);
 
     React.useEffect(() => {
@@ -454,14 +418,14 @@ function Players(): JSX.Element {
             </div>
         </div>
         <div>
-            {!isLoading ?
-                players
+            {PLAYERS_ARE_LOADED ?
+                people
                     .filter(p => p.summonerName.toLowerCase().startsWith(search?.toLowerCase()))
-                    .map((p, i) => <Player player={p} setIsLoading={setIsLoading} key={i}/>) :
+                    .map((p, i) => <Person person={p} key={i}/>) :
                 <div className="loaderContainer"><div className="loader"></div></div>
             }
         </div>
     </div>;
 }
 
-export default Players;
+export default People;

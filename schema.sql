@@ -1,9 +1,16 @@
+CREATE TABLE IF NOT EXISTS person(
+	timestamp INTEGER  NOT NULL,
+	personName VARCHAR(16)  NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS player(
 	timestamp INTEGER  NOT NULL,
 	accountId INTEGER  NOT NULL,
 	summonerName VARCHAR(30)  NOT NULL,
 	iconId INTEGER  NOT NULL,
-	PRIMARY KEY (accountId)
+	personName VARCHAR(16) ,
+	PRIMARY KEY (accountId),
+	FOREIGN KEY (personName) REFERENCES person(personName)
 );
 
 CREATE TABLE IF NOT EXISTS match(

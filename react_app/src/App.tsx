@@ -7,6 +7,7 @@ import './Icons.css';
 import Players from './Players';
 import Matches from './Matches';
 import AddMatch from './AddMatch';
+import People from './People';
 
 const MainTab = ({ tab }: { tab: ITab }) =>
 	<div className='mainTab whiteWhenHovered'>
@@ -15,7 +16,13 @@ const MainTab = ({ tab }: { tab: ITab }) =>
 
 const tabs: ITab[] = [
 	{ 
-		label: "players", 
+		label: "people", 
+		route: "/people", 
+		component: People,
+		otherPaths: ['/people/:name?']
+	},
+	{ 
+		label: "accounts", 
 		route: "/players", 
 		component: Players,
 		otherPaths: ['/players/:accId?']

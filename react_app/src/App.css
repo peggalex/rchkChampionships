@@ -163,6 +163,10 @@ button:disabled{
   background-color: white !important;
 }
 
+.blueTextHover:hover {
+  color: var(--leagueBlue);
+}
+
 .loaderContainer {
   display: flex;
   justify-content: center;

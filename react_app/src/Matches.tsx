@@ -117,6 +117,7 @@ function Match(
     {match: IMatch}
 ): JSX.Element {
 
+    let index = MATCHES.length - MATCHES.map(m => m.matchId).indexOf(matchId);
     let dateObj = new Date(date);
     let time = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(dateObj);
     let month = new Intl.DateTimeFormat('en-US', { month: 'long'}).format(dateObj);
@@ -135,6 +136,7 @@ function Match(
             <div className="collapseIcon">
                 {isExpanded ? Icons.ChevronUp :  Icons.ChevronDown}
             </div>
+            <p className="matchIndex">{index}</p>
             <h2 className="matchMonth">{month} {day}{daySuffix}</h2>
             <p className="matchTime">{time}</p>
             <p className="matchYear">{dateObj.getFullYear()}</p>
@@ -172,7 +174,7 @@ function TeamPlayer({player}: {player: ITeamPlayer}): JSX.Element {
             <Spells spell1={player.spell1} spell2={player.spell2}/>
             <img className="teamPlayerChampionIcon circle" src={GetChampIconUrl(player.champion)}/>
             <img className="keyStone" src={GetKeystoneIconUrl(player.keyStoneUrl)}/>
-            <p onClick={()=>history.push(`/players/${player.accountId}`)} className="clickable">{player.summonerName}</p>
+            <p onClick={()=>history.push(`/players/${player.accountId}`)} className="clickable blueTextHover">{player.summonerName}</p>
             <Items items={Array.from(Array(6)).map((_, i) => (player as any)[`item${i}`])}/>
         </div>
         <div className="row centerCross">

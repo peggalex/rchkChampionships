@@ -2,13 +2,16 @@ import traceback
 import logging as notFlaskLogging
 from flask import *
 from addMatch import addMatch
-from getMatch import getMatches, getPlayerStats
+from getMatch import getMatches
+from getPlayerPersonStats import getPlayerStats, getPersonStats
+from setAccountPersonName import setAccountPersonName
 from SqliteLib import SqliteDB
 import quopri
 from serverUtilities import assertGoodRequest, BadRequestException 
 import webarchive
 import os
 import tempfile
+import re
 
 notFlaskLogging.basicConfig(level=notFlaskLogging.DEBUG)
 app = Flask(__name__, static_folder='./react_app/build/static', template_folder="./react_app/build")
@@ -106,9 +109,30 @@ def getPlayerStatsEndpoint():
         except Exception as e:
             return handleException(cursor, e)
 
+@app.route('/getPersonStats', methods=['GET'])
+def getPersonStatsEndpoint():
+
+    with SqliteDB() as cursor:
+        try:
+            return {"res": getPersonStats(cursor)}, 200
+        except Exception as e:
+            return handleException(cursor, e)
+
+
+@app.route('/setAccountPersonName/<accountId>/personName/<personName>', methods=['POST'])
+def setAccountPersonNameEndpoint(accountId: str, personName: str):
+
+    with SqliteDB() as cursor:
+        try:
+            assertGoodRequest(re.match("^\d+$", accountId), f"account id '{accountId}' not numeric")
+            assertGoodRequest(re.match("^[\dA-Za-z ]+$", personName), f"person name '{personName}'' not alphanumeric with spaces")
+            return {"res": setAccountPersonName(cursor, accountId, personName)}, 200
+        except Exception as e:
+            return handleException(cursor, e)
+
 
 @app.route('/images/<filename>')
-def favicon(filename):
+def getImagesEndpoint(filename):
 
     return send_from_directory(
         os.path.join(app.root_path, 'react_app/build'),

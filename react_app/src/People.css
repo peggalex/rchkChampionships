@@ -1,0 +1,5 @@
+.personPic > svg{
+    width: 1.5rem;
+    stroke-width: 0.1rem;
+    color: white;
+}

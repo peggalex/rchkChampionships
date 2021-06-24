@@ -2,11 +2,26 @@ from SqliteLib import *
 from typing import DefaultDict, Optional
 from datetime import datetime, timedelta
 
+PERSON_TABLE = DatedTable("person")
+PERSON_NAME_COL = PERSON_TABLE.CreateColumn("personName", VarCharType(16))
+
 PLAYER_TABLE = DatedTable("player")
 
 PLAYER_ACCOUNTID_COL = PLAYER_TABLE.CreateColumn("accountId", INTEGER_TYPE, isPrimary = True)
 PLAYER_SUMMONERNAME_COL = PLAYER_TABLE.CreateColumn("summonerName", VarCharType(30))
 PLAYER_ICONID_COL = PLAYER_TABLE.CreateColumn("iconId", INTEGER_TYPE)
+PLAYER_TABLE.CreateForeignKey(PERSON_NAME_COL, isPrimary=False, isNotNull=False)
+
+def AddOrUpdatePersonName(cursor: SqliteDB, accountId: int, personName: str):
+    if not cursor.Exists(cursor.Q([], PERSON_TABLE, {PERSON_NAME_COL: personName})):
+        cursor.InsertIntoTable(
+            PERSON_TABLE, {PERSON_NAME_COL: [personName]}
+        )
+    cursor.Execute(f"""
+        UPDATE {PLAYER_TABLE.name}
+        SET {PERSON_NAME_COL.name} = '{personName}'
+        WHERE {PLAYER_ACCOUNTID_COL.name} = {accountId}
+    """)
 
 def AddPlayer(cursor: SqliteDB, accountId: int, summonerName: str, iconId: int):
     cursor.InsertIntoTable(
@@ -219,5 +234,5 @@ def GetMostRecentGame(cursor: SqliteDB, accountId: int):
 if __name__ == "__main__":
     WriteSchema(
         "schema.sql",
-        [PLAYER_TABLE, MATCH_TABLE, TEAM_TABLE, TEAMPLAYER_TABLE]
+        [PERSON_TABLE, PLAYER_TABLE, MATCH_TABLE, TEAM_TABLE, TEAMPLAYER_TABLE]
     )
