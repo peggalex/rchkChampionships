@@ -19,7 +19,7 @@ const tabs: ITab[] = [
 		label: "people", 
 		route: "/people", 
 		component: People,
-		otherPaths: ['/people/:name?']
+		otherPaths: ['/people/:selectedPersonName?']
 	},
 	{ 
 		label: "accounts", 
