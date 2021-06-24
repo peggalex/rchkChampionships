@@ -206,7 +206,7 @@ async function get_average_rgb(src: string): Promise<Uint8ClampedArray> {
 }
 
 function PersonIcon({iconId}: {iconId: number}){
-    let [personColorStr, setPersonColorStr] = React.useState("white");
+    let [personColorStr, setPersonColorStr] = React.useState("var(--grey800)");
     React.useEffect(() => {
         getAvgColorStr(GetProfileIconUrl(iconId)).then(
             (color) => setPersonColorStr(color)

@@ -151,6 +151,8 @@ export function AdditionalStats({
             isPerMin: boolean
         }){
 
+    let formatNum = (n: number) => Math.round(n).toLocaleString("en");
+
     let data = [
         {
             icon: Icons.KillParticipationIcon,
@@ -159,17 +161,17 @@ export function AdditionalStats({
         },
         {
             icon: Icons.DmgDealtIcon,
-            value: Math.round(dmgDealt),
+            value: formatNum(dmgDealt),
             label: `damage dealt${isPerMin ? ' per minute' : ""}`
         },
         {
             icon: Icons.DmgTakenIcon,
-            value: Math.round(dmgTaken),
+            value: formatNum(dmgTaken),
             label: `damage taken${isPerMin ? ' per minute' : ""}`
         },
         {
             icon: Icons.GoldIcon,
-            value: Math.round(gold),
+            value: formatNum(gold),
             label: `gold${isPerMin ? ' per minute' : ""}`
         }
     ]

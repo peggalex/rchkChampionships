@@ -363,7 +363,7 @@ function Matches(): JSX.Element {
                 </button>
                 {state.playerFilter.expanded ? 
                     <div className="playerSortSelection col">
-                        <SortOption label="ANY" onClick={() => dispatch({
+                        <SortOption label="<ANY>" onClick={() => dispatch({
                                 type: "setPlayerFilter", 
                                 payload: {...state, playerFilter: {...state.playerFilter, val: undefined}}
                             })}
@@ -391,7 +391,7 @@ function Matches(): JSX.Element {
                 {state.championFilter.expanded ? 
                     <div className="playerSortSelection col">
                         <SortOption 
-                            label="ANY" 
+                            label="<ANY>" 
                             onClick={() => dispatch({
                                 type: "setChampionFilter", 
                                 payload: {...state, championFilter: {...state.championFilter, val: undefined}}
