@@ -97,12 +97,51 @@ function Spells({spell1, spell2}: {spell1: string, spell2: string}){
 }
 
 function Items({items}: {items: number[]}): JSX.Element {
-    return <div className={"items"}>{
+    return <div className="items">{
         items.map((id, i) => 
             id !== 0 ? 
                 <img className="item" src={GetItemIconUrl(id)} key={i} loading="lazy"/> : 
                 <span className="item noItem"/>
         )
+    }</div>
+}
+
+function Medal({icon, count, label}: {icon: JSX.Element, count: number, label: string}){
+    return <div className="medalContainer row centerCross" title={label}>
+        <div className="medalIcon centerAll">{icon}</div>
+        <p>{count}</p>
+    </div>
+}
+
+function Medals({
+    doubles,
+	triples,
+	quadras,
+	pentas,
+	firstBlood,
+	turrets,
+	inhibs
+}: {
+	doubles: number,
+	triples: number,
+	quadras: number,
+	pentas: number,
+	firstBlood: boolean,
+	turrets: number,
+	inhibs: number
+}){
+    return <div className="medalsContainer row centerCross">{
+        [
+            {icon: Icons.Penta, count: pentas, label: "Penta kills"},
+            {icon: Icons.Quadra, count: quadras, label: "Quadra kills"},
+            {icon: Icons.Triple, count: triples, label: "Triple kills"},
+            {icon: Icons.Double, count: doubles, label: "Double kills"},
+            {icon: Icons.Tower, count: turrets, label: "Towers killed"},
+            {icon: Icons.Inhib, count: inhibs, label: "Inhibitors killed"},
+            {icon: Icons.FirstBlood, count: firstBlood ? 1 : 0, label: "First blood"},
+        ]
+        .filter(({count}) => 0 < count)
+        .map(({icon, count, label}, i) => <Medal icon={icon} count={count} label={label} key={i}/>)
     }</div>
 }
 
@@ -166,20 +205,23 @@ function Team(
     </div>
 }
 
-function TeamPlayer({player}: {player: ITeamPlayer}): JSX.Element {
+function TeamPlayer({player: p}: {player: ITeamPlayer}): JSX.Element {
 
     const history = useHistory();
     return <div className="teamPlayer col">
         <div className="row centerCross">
-            <Spells spell1={player.spell1} spell2={player.spell2}/>
-            <img className="teamPlayerChampionIcon circle" src={GetChampIconUrl(player.champion)}/>
-            <img className="keyStone" src={GetKeystoneIconUrl(player.keyStoneUrl)}/>
-            <p onClick={()=>history.push(`/players/${player.accountId}`)} className="clickable blueTextHover">{player.summonerName}</p>
-            <Items items={Array.from(Array(6)).map((_, i) => (player as any)[`item${i}`])}/>
+            <Spells spell1={p.spell1} spell2={p.spell2}/>
+            <img className="teamPlayerChampionIcon circle" src={GetChampIconUrl(p.champion)}/>
+            <img className="keyStone" src={GetKeystoneIconUrl(p.keyStoneUrl)}/>
+            <p onClick={()=>history.push(`/players/${p.accountId}`)} className="clickable blueTextHover">{p.summonerName}</p>
+            <div className="teamPlayerRHS col">
+                <Items items={Array.from(Array(6)).map((_, i) => (p as any)[`item${i}`])}/>
+                <Medals doubles={p.doubles} triples={p.triples} quadras={p.quadras} pentas={p.pentas} firstBlood={p.firstBlood} turrets={p.turrets} inhibs={p.inhibs}/>
+            </div>
         </div>
         <div className="row centerCross">
-            <KDAStat k={player.kills} d={player.deaths} a={player.assists} isMini={true}/>
-            <AdditionalStats kp={player.kp} dmgDealt={player.dmgDealt} dmgTaken={player.dmgTaken} gold={player.gold} isPerMin={false}/>
+            <KDAStat k={p.kills} d={p.deaths} a={p.assists} isMini={true}/>
+            <AdditionalStats kp={p.kp} dmgDealt={p.dmgDealt} dmgTaken={p.dmgTaken} gold={p.gold} isPerMin={false}/>
         </div>
     </div>
 }

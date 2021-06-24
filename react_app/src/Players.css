@@ -112,10 +112,24 @@
     color: var(--grey900);
 }
 
+#playersContainer{
+    counter-reset: score;
+}
+
 .player {
     background-color: var(--grey100);
     height: 7.5rem;
     padding: 0.5rem 0;
+}
+
+.player h2:before {
+    counter-increment: score;
+    margin-right: 0.3rem;
+    font-size: 0.85rem;
+    color: var(--grey600);
+    font-weight: 500;
+    content: "" counter(score) ". ";
+    display: inline-block;
 }
 
 .championAvgsContainer {
@@ -159,6 +173,10 @@
 
 .champion .statBreakdown {
     transform: scale(0.75);
+}
+
+.player {
+    counter-increment: listCounter;
 }
 
 .player h2 {
