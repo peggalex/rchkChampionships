@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, Redirect, useHistory, use
 import { GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI, NumericCompareFunc, CompareNumbers, CompareType, CompareFunc, GetPlayerElementId, GetProfileIconUrl } from './Utilities';
 import "./Players.css";
 import Icons from './Icons';
+import Medals from './Medals';
 
 const winRateSort = {
     name: 'winrate', 
@@ -83,7 +84,15 @@ interface IAvg {
     avgDmgTaken: number,
     avgGold: number,
     wins: number,
-    noGames: number
+    noGames: number,
+
+    doubles: number,
+    triples: number,
+    quadras: number,
+    pentas: number,
+    firstBlood: boolean,
+    turrets: number,
+    inhibs: number
 }
 
 interface IChampionAvg extends IAvg {
@@ -350,7 +359,15 @@ function PlayerChampion(
         avgDmgTaken,
         avgGold,
         wins,
-        noGames
+        noGames,
+
+        doubles,
+        triples,
+        quadras,
+        pentas,
+        firstBlood,
+        turrets,
+        inhibs
     }, accountId}:
     {championAvg: IChampionAvg, accountId: number}
 ): JSX.Element {
@@ -374,6 +391,7 @@ function PlayerChampion(
             </div>
         </div>
         <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
+        <Medals doubles={doubles} triples={triples} quadras={quadras} pentas={pentas} turrets={turrets} inhibs={inhibs} firstBlood={firstBlood}/>
     </div>
 }
 

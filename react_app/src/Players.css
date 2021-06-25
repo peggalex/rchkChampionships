@@ -351,6 +351,12 @@
     bottom: 0.5rem;
 }
 
+.champion .medalsContainer {
+    position: absolute;
+    left: 5rem;
+    bottom: 0.75rem;
+}
+
 .summonerNameContainer {
     position: relative;
 }

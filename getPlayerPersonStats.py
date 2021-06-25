@@ -6,6 +6,7 @@ def getStats(cursor: SqliteDB, groupBy: Column):
     #groupBy should be a player attribute
 
     playerColumns = [PLAYER_ACCOUNTID_COL, PLAYER_SUMMONERNAME_COL, PLAYER_ICONID_COL, PERSON_NAME_COL]
+    sumColumns = [TEAMPLAYER_DOULBES_COL, TEAMPLAYER_TRIPLES_COL, TEAMPLAYER_QUADRAS_COL, TEAMPLAYER_PENTAS_COL, TEAMPLAYER_TURRETS_COL, TEAMPLAYER_INHIBS_COL, TEAMPLAYER_FIRSTBLOOD_COL]
     avgColumns = [TEAMPLAYER_KILLS_COL, TEAMPLAYER_DEATHS_COL, TEAMPLAYER_ASSISTS_COL, TEAMPLAYER_KP_COL]
     avgColumnsPerMin = [TEAMPLAYER_CS_COL, TEAMPLAYER_DMGDEALT_COL, TEAMPLAYER_DMGTAKEN_COL, TEAMPLAYER_GOLD_COL]
 
@@ -23,6 +24,7 @@ def getStats(cursor: SqliteDB, groupBy: Column):
             {','.join(f'p.{c.name} AS {c.name}' for c in playerColumns)},
             {winsQuery} AS {winsName},
             COUNT(*) AS {countName},
+            {','.join((f'SUM({c.name}) AS {c.name}') for c in sumColumns)},
             {','.join((f'AVG({c.name}) AS {colToAvgName(c)}' for c in avgColumns))},
             {','.join((f'AVG(({c.name}*60.0)/{MATCH_LENGTH_COL.name}) AS {colToAvgName(c)}' for c in avgColumnsPerMin))}
         FROM
@@ -44,6 +46,7 @@ def getStats(cursor: SqliteDB, groupBy: Column):
     avgStats = cursor.FetchAll(f"""
         SELECT 
             {','.join(c.name for c in playerColumns)},
+            {','.join((f'SUM({c.name}) AS {c.name}') for c in sumColumns)},
             SUM({winsName}) AS {winsName},
             SUM({countName}) AS {countName},
             {','.join((f'SUM({colToAvgName(c)} * {countName})/SUM({countName}) AS {colToAvgName(c)}' for c in [*avgColumns, *avgColumnsPerMin]))}
