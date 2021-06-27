@@ -62,9 +62,10 @@
 
 .matchHistory > svg {
     height: 1rem;
+    width: 1rem;
+    margin-left: 0.25rem;
     color: var(--leagueBlue);
     stroke-width: 2.5;
-    margin-right: -0.5rem;
 }
 
 h2.matchMonth {
@@ -379,4 +380,11 @@ h2.teamScore {
 .kdaContainer.whole .kda > * {
     width: 1rem;
     text-align: center;
+}
+
+
+@media (max-width: 600px) {
+    .generalChampIcon {
+        border: 1px solid;
+    }
 }
