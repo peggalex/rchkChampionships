@@ -90,7 +90,7 @@ interface IAvg {
     triples: number,
     quadras: number,
     pentas: number,
-    firstBlood: boolean,
+    firstBlood: number,
     turrets: number,
     inhibs: number
 }
@@ -109,7 +109,7 @@ interface IPlayer {
     championAvgs: IChampionAvg[]
 }
 
-function WinRate({wins, games, isMini}: {wins: number, games: number, isMini: boolean}){
+export function WinRate({wins, games, isMini}: {wins: number, games: number, isMini: boolean}){
     let losses = games - wins;
     let winRate = (100 * (wins / games)).toFixed(0);
 
@@ -125,17 +125,19 @@ function WinRate({wins, games, isMini}: {wins: number, games: number, isMini: bo
     </div>
 }
 
-export function KDAStat({k, d, a, isMini}: {k: number, d: number, a: number, isMini: boolean}){
-    let totalKda = d == 0 ?  "∞ " : ((k + a)/d).toFixed(isMini ? 1 : 2);
 
-    return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"}`}>
+export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: number, a: number, isMini: boolean, isWhole?: boolean}){
+    let totalKda = d == 0 ?  "∞ " : ((k + a)/d).toFixed(isMini ? 1 : 2);
+    let formatKDA = (n: number) => n.toFixed(isWhole ? 0 : 1);
+
+    return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"}`}>
         <span className="totalKda mainStat">
             {totalKda}
         </span>
         <div className="kda statBreakdown">
-            <span className="kills">{k.toFixed(1)}</span>
-            <span className="deaths">{d.toFixed(1)}</span>
-            <span className="assists">{a.toFixed(1)}</span>
+            <span className="kills" title={`Kills: ${formatKDA(k)}`}>{formatKDA(k)}</span>
+            <span className="deaths" title={`Deaths: ${formatKDA(d)}`}>{formatKDA(d)}</span>
+            <span className="assists" title={`Assists: ${formatKDA(a)}`}>{formatKDA(a)}</span>
         </div>
     </div>
 }
@@ -147,46 +149,46 @@ export function CreepScore({cs, isMini}: {cs: number, isMini: boolean}){
 }
 
 export function AdditionalStats({
-            kp, 
-            dmgDealt, 
-            dmgTaken, 
-            gold, 
-            isPerMin
-        }: {
-            kp: number,
-            dmgDealt: number, 
-            dmgTaken: number, 
-            gold: number, 
-            isPerMin: boolean
-        }){
+        kp, 
+        dmgDealt, 
+        dmgTaken, 
+        gold, 
+        isPerMin
+    }: {
+        kp: number,
+        dmgDealt: number, 
+        dmgTaken: number, 
+        gold: number, 
+        isPerMin: boolean
+    }){
 
-    let formatNum = (n: number) => Math.round(n).toLocaleString("en");
+    const formatStat = (n: number) => Math.round(n).toLocaleString("en");
 
     let data = [
-        {
-            icon: Icons.KillParticipationIcon,
-            value: `${Math.round(kp)}%`,
-            label: "kill participation"
-        },
-        {
-            icon: Icons.DmgDealtIcon,
-            value: formatNum(dmgDealt),
-            label: `damage dealt${isPerMin ? ' per minute' : ""}`
-        },
-        {
-            icon: Icons.DmgTakenIcon,
-            value: formatNum(dmgTaken),
-            label: `damage taken${isPerMin ? ' per minute' : ""}`
-        },
-        {
-            icon: Icons.GoldIcon,
-            value: formatNum(gold),
-            label: `gold${isPerMin ? ' per minute' : ""}`
-        }
+    {
+        icon: Icons.KillParticipationIcon,
+        value: `${Math.round(kp)}%`,
+        label: "Kill Participation"
+    },
+    {
+        icon: Icons.DmgDealtIcon,
+        value: formatStat(dmgDealt),
+        label: `Damage Dealt${isPerMin ? ' / min' : ""}`
+    },
+    {
+        icon: Icons.DmgTakenIcon,
+        value: formatStat(dmgTaken),
+        label: `Damage Taken${isPerMin ? ' / min' : ""}`
+    },
+    {
+        icon: Icons.GoldIcon,
+        value: formatStat(gold),
+        label: `Gold${isPerMin ? ' / min' : ""}`
+    }
     ]
 
     return <div className="additionalStats row centerCross spaceAround">
-        {data.map((d, i) => <div className="row centerAll" title={d.label} key={i}>
+        {data.map((d, i) => <div className="row centerAll" title={`${d.label}: ${d.value}`} key={i}>
             <div className="additionalStatIcon row centerAll">{d.icon}</div>
             <div>{d.value}</div>
         </div>
@@ -391,7 +393,7 @@ function PlayerChampion(
             </div>
         </div>
         <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
-        <Medals doubles={doubles} triples={triples} quadras={quadras} pentas={pentas} turrets={turrets} inhibs={inhibs} firstBlood={firstBlood}/>
+        <Medals doubles={doubles} triples={triples} quadras={quadras} pentas={pentas} turrets={turrets} inhibs={inhibs} firstBloods={firstBlood}/>
     </div>
 }
 

@@ -1,6 +1,7 @@
 .match {
     background-color: var(--grey100);
-    height: 3rem;
+    height: 8rem;
+    position: relative;
 }
 
 .teamsContainer {
@@ -47,6 +48,7 @@
     padding: 0 0.75rem;
     font-size: 0.8rem;
     margin-right: 0.5rem;
+    z-index: 1;
 }
 
 .matchHistory:hover {
@@ -65,17 +67,20 @@
     margin-right: -0.5rem;
 }
 
+h2.matchMonth {
+    margin: 0;
+    color: var(--grey800);
+}
+
 .matchTime, .matchYear {
     margin-top: 0;
     margin-bottom: 0;
-    padding-top: 0.6rem;
     margin-left: 0.25rem;
     font-size: 0.8rem;
 }
 
 .matchTime {
     color: var(--grey700);
-    margin-left: 0.4rem;
 }
 
 .matchYear {
@@ -91,9 +96,8 @@
 }
 
 .teamPlayerChampionIcon {
-    --radius: 2rem;
-    margin-left: 0.5rem;
-    margin-right: 0;
+    --radius: 2.3rem;
+    position: absolute;
 }
 
 .matchHistory:hover:before {
@@ -104,7 +108,10 @@
 .items {
     margin-left: auto;
     height: 1.25rem;
-    margin-right: 0.5rem;
+}
+
+.items, .medalsContainer{
+    margin-right: .5rem;
 }
 
 .item + .item {
@@ -148,6 +155,7 @@
     height: 1.25rem;
     margin-left: -0.85rem;
     margin-top: 1.5rem;
+    z-index: 1;
 }
 
 .teamPlayer .totalKda {
@@ -221,4 +229,154 @@ p.matchIndex:after {
 
 .medalContainer > p:before {
     content: "x";
+}
+
+.teamPlayerChampionIconContainer {
+    --radius: 2rem;
+    margin-left: .5rem;
+    margin-right: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.teamMiddle.blueSide, .teamMiddle.redSide .medalsContainer {
+    flex-direction: row-reverse;
+}
+
+.teamMiddle.redSide .medalContainer:before{
+    margin-left: 0;
+}
+
+.teamMiddle.redSide .medalContainer:after{
+    margin-right: 0;
+}
+
+.matchMiddle {
+    position: absolute;
+    width: 100%;
+}
+
+.teamMiddle {
+    width: 15rem;
+    justify-content: flex-end;
+}
+
+.teamMiddle .medalContainer {
+    margin-top: 0;
+}
+
+.teamMiddle .medals {
+    margin: 0 0.5rem;
+}
+
+.teamMiddle .medalsContainer {
+    margin-right: 0;
+}
+
+h2.teamScore.lose {
+    font-weight: 200;
+}
+
+.teamMiddle + .teamMiddle:after {
+    content: "•";
+    position: absolute;
+    width: 0.5rem;
+    left: calc(50% - 0.25rem);
+}
+
+.redSide.teamMiddle .teamScore {
+    text-align: end;
+}
+
+h2.teamScore {
+    font-size: 2rem;
+    color: var(--grey900);
+    margin: 0;
+}
+
+.gameLength {
+    position: absolute;
+    top: -0.75rem;
+    color: var(--grey600);
+    font-size: 0.6rem;
+    font-weight: 200;
+}
+
+.gameLength > p {
+    margin: 0;
+    margin-left: 0.25rem;
+}
+
+.clockContainer > svg {
+    width: 0.6rem;
+    height: 0.6rem;
+    color: var(--grey500)
+}
+
+h2.teamScore {
+    font-size: 2rem;
+    color: var(--grey900);
+    margin: 0 0.6rem;
+}
+
+.generalChampIconTeams {
+    margin: 0 0.5rem;
+}
+
+.generalChampIcons {
+    position: absolute;
+    top: 3rem;
+}
+
+.generalChampIcon {
+    border: solid 2px;
+}
+
+.banIconContainer, .generalChampIcon {
+    --radius: 1.2rem;
+}
+
+.generalChampIcon + .generalChampIcon, .banContainer + .banContainer{
+    margin-left: 0.4rem;
+}
+
+.redSide.generalChampIconTeams .generalChampIcon {
+    border-color: var(--red);
+}
+
+.redSide.generalChampIconTeams .banIconContainer > svg {
+    color: var(--red);
+}
+
+.blueSide.generalChampIconTeams .generalChampIcon {
+    border-color: var(--blue400);
+}
+
+.blueSide.generalChampIconTeams .banIconContainer {
+    color: var(--blue400);
+}
+
+.banContainer {
+    position: relative;
+}
+
+.banIconContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.banIconContainer > svg {
+    width: 100%;
+    transform: scale(1.2);
+    height: 100%;
+}
+
+.teamsContainer .totalKda {
+    width: 4rem;
+}
+
+.kdaContainer.whole .kda > * {
+    width: 1rem;
+    text-align: center;
 }

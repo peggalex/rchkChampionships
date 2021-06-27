@@ -4,6 +4,7 @@ import { GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI, NumericComp
 import "./People.css";
 import Icons from './Icons';
 import Medals from './Medals';
+import { AdditionalStats, CreepScore, KDAStat, WinRate } from './Players';
 
 const winRateSort = {
     name: 'winrate', 
@@ -90,7 +91,7 @@ interface IAvg {
     triples: number,
     quadras: number,
     pentas: number,
-    firstBlood: boolean,
+    firstBlood: number,
     turrets: number,
     inhibs: number
 }
@@ -106,89 +107,6 @@ interface IPerson {
     iconId: number,
     accounts: {[accountId: number]: string},
     championAvgs: IChampionAvg[]
-}
-
-function WinRate({wins, games, isMini}: {wins: number, games: number, isMini: boolean}){
-    let losses = games - wins;
-    let winRate = (100 * (wins / games)).toFixed(0);
-
-    return <div className={`winRateContainer statContainer ${isMini ? "mini" : "large"}`}>
-        <span className="winRateTotal mainStat">
-            {winRate}%
-        </span>
-        <div className="noGames statBreakdown">
-            <span className="wins">{wins}</span>
-            <span className="losses">{losses}</span>
-            <span className="totalGames">{games}</span>
-        </div>
-    </div>
-}
-
-export function KDAStat({k, d, a, isMini}: {k: number, d: number, a: number, isMini: boolean}){
-    let totalKda = d == 0 ?  "∞ " : ((k + a)/d).toFixed(isMini ? 1 : 2);
-
-    return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"}`}>
-        <span className="totalKda mainStat">
-            {totalKda}
-        </span>
-        <div className="kda statBreakdown">
-            <span className="kills">{k.toFixed(1)}</span>
-            <span className="deaths">{d.toFixed(1)}</span>
-            <span className="assists">{a.toFixed(1)}</span>
-        </div>
-    </div>
-}
-
-export function CreepScore({cs, isMini}: {cs: number, isMini: boolean}){
-    return <span className={`csMin mainStat ${isMini ? "mini" : "large"}`}>
-        {cs.toFixed(1)}
-    </span>
-}
-
-export function AdditionalStats({
-            kp, 
-            dmgDealt, 
-            dmgTaken, 
-            gold, 
-            isPerMin
-        }: {
-            kp: number,
-            dmgDealt: number, 
-            dmgTaken: number, 
-            gold: number, 
-            isPerMin: boolean
-        }){
-
-    let data = [
-        {
-            icon: Icons.KillParticipationIcon,
-            value: `${Math.round(kp)}%`,
-            label: "kill participation"
-        },
-        {
-            icon: Icons.DmgDealtIcon,
-            value: Math.round(dmgDealt),
-            label: `damage dealt${isPerMin ? ' per minute' : ""}`
-        },
-        {
-            icon: Icons.DmgTakenIcon,
-            value: Math.round(dmgTaken),
-            label: `damage taken${isPerMin ? ' per minute' : ""}`
-        },
-        {
-            icon: Icons.GoldIcon,
-            value: Math.round(gold),
-            label: `gold${isPerMin ? ' per minute' : ""}`
-        }
-    ]
-
-    return <div className="additionalStats row centerCross spaceAround">
-        {data.map((d, i) => <div className="row centerAll" title={d.label} key={i}>
-            <div className="additionalStatIcon row centerAll">{d.icon}</div>
-            <div>{d.value}</div>
-        </div>
-        )}
-    </div>
 }
 
 
@@ -352,7 +270,7 @@ function PersonChampion(
             </div>
         </div>
         <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
-        <Medals doubles={doubles} triples={triples} quadras={quadras} pentas={pentas} turrets={turrets} inhibs={inhibs} firstBlood={firstBlood}/>
+        <Medals doubles={doubles} triples={triples} quadras={quadras} pentas={pentas} turrets={turrets} inhibs={inhibs} firstBloods={firstBlood}/>
     </div>
 }
 

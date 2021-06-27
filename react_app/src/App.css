@@ -115,7 +115,7 @@ footer {
 .circle {
   width: var(--radius);
   height: var(--radius);
-  border-radius: calc(var(--radius)/2);
+  border-radius: calc(100%);
 }
 
 .fullLength {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect, useParams, useHistory } from 'react-router-dom';
-import { EnumArray, GetChampIconUrl, RestfulType, CallAPI, GetItemIconUrl, GetSpellIconUrl, GetKeystoneIconUrl } from './Utilities';
+import { EnumArray, GetChampIconUrl, RestfulType, CallAPI, GetItemIconUrl, GetSpellIconUrl, GetKeystoneIconUrl, secsToHMS, GetProfileIconUrl } from './Utilities';
 import "./Matches.css";
 import Icons from './Icons';
 import Players, { AdditionalStats, KDAStat } from './Players';
@@ -111,6 +111,7 @@ function Match(
     {match: {
         matchId, 
         date, 
+        length,
         redSideWon, 
         redSide,
         blueSide
@@ -124,7 +125,7 @@ function Match(
     let month = new Intl.DateTimeFormat('en-US', { month: 'long'}).format(dateObj);
     let day = dateObj.getDate();
     let daySuffix = getDaySuffix(day);
-    const [isExpanded, setIsExpanded] = React.useState(true);
+    const [isExpanded, setIsExpanded] = React.useState(false);
 
     let region = "JP1";
     let matchLink = `https://matchhistory.na.leagueoflegends.com/en/#match-details/${region}/${matchId}/00000?tab=overview`;
@@ -138,9 +139,45 @@ function Match(
                 {isExpanded ? Icons.ChevronUp :  Icons.ChevronDown}
             </div>
             <p className="matchIndex">{index}</p>
-            <h2 className="matchMonth">{month} {day}{daySuffix}</h2>
-            <p className="matchTime">{time}</p>
-            <p className="matchYear">{dateObj.getFullYear()}</p>
+            <div className='col'>
+                <h2 className="matchMonth">{month} {day}{daySuffix}</h2>
+                <div className='row'>
+                    <p className="matchTime">{time}</p>
+                    <p className="matchYear">{dateObj.getFullYear()}</p>
+                </div>
+            </div>
+
+            <div className="matchMiddle row center">
+                {[redSide, blueSide].map((t, i) => <div className={`${t.isRedSide ? 'redSide' : 'blueSide'} teamMiddle row centerCross`} key={i}>
+                    <div className={`${t.isRedSide ? 'redSide' : 'blueSide'} medals`}>
+                        <Medals turrets={t.towers} inhibs={t.inhibs} dragons={t.dragons} barons={t.barons}/>
+                    </div>
+                    <h2 className={`teamScore ${t.isRedSide == redSideWon ? 'win' : 'lose'}`}>
+                        {t.kills}
+                    </h2>
+                </div>)}
+                <div className="gameLength row centerCross">
+                    <div className="clockContainer centerAll">{Icons.Clock}</div>
+                    <p>{secsToHMS(length)}</p>
+                </div>
+                <div className="generalChampIcons row">{[redSide, blueSide].map((t, i) => <div className={`${t.isRedSide ? 'redSide' : 'blueSide'} generalChampIconTeams row`} key={i}>
+                    {isExpanded ? 
+                        Array.from(Array(5)).map((_, j) => {
+                            let champ: string = (t as any)[`ban${j}`];
+                            return <div className="banContainer">
+                                <img 
+                                    className="generalChampIcon circle" 
+                                    src={champ === "" ? GetProfileIconUrl(29) : GetChampIconUrl(champ)} 
+                                    key={j}
+                                />
+                                <div className="banIconContainer">{Icons.Ban}</div>
+                            </div>
+                        }) :
+                        t.players.map((p, j) => <img className="generalChampIcon circle" src={GetChampIconUrl(p.champion)} key={j}/>)
+                    }
+                </div>)}</div>
+            </div>
+
             <a className="matchHistory centerAll" href={matchLink} target="_blank">{Icons.Link}</a>
         </div>
         {isExpanded ? <div className="teamsContainer row">
@@ -173,16 +210,18 @@ function TeamPlayer({player: p}: {player: ITeamPlayer}): JSX.Element {
     return <div className="teamPlayer col">
         <div className="row centerCross">
             <Spells spell1={p.spell1} spell2={p.spell2}/>
-            <img className="teamPlayerChampionIcon circle" src={GetChampIconUrl(p.champion)}/>
+            <div className="teamPlayerChampionIconContainer circle centerAll">
+                <img className="teamPlayerChampionIcon circle" src={GetChampIconUrl(p.champion)}/>
+            </div>
             <img className="keyStone" src={GetKeystoneIconUrl(p.keyStoneUrl)}/>
             <p onClick={()=>history.push(`/players/${p.accountId}`)} className="clickable blueTextHover">{p.summonerName}</p>
             <div className="teamPlayerRHS col">
                 <Items items={Array.from(Array(6)).map((_, i) => (p as any)[`item${i}`])}/>
-                <Medals doubles={p.doubles} triples={p.triples} quadras={p.quadras} pentas={p.pentas} firstBlood={p.firstBlood} turrets={p.turrets} inhibs={p.inhibs}/>
+                <Medals doubles={p.doubles} triples={p.triples} quadras={p.quadras} pentas={p.pentas} firstBloods={p.firstBlood?1:0} turrets={p.turrets} inhibs={p.inhibs}/>
             </div>
         </div>
         <div className="row centerCross">
-            <KDAStat k={p.kills} d={p.deaths} a={p.assists} isMini={true}/>
+            <KDAStat k={p.kills} d={p.deaths} a={p.assists} isMini={true} isWhole={true}/>
             <AdditionalStats kp={p.kp} dmgDealt={p.dmgDealt} dmgTaken={p.dmgTaken} gold={p.gold} isPerMin={false}/>
         </div>
     </div>
@@ -360,7 +399,7 @@ function Matches(): JSX.Element {
         <div id="playerTopBar" className="row centerCross">
             <div className="sortContainer col centerAll">
                 <button 
-                    className="playerSort clickable" 
+                    className="playerSort clickable whiteWhenHovered" 
                     onClick={() => dispatch({type: "togglePlayerFilter"})}
                 >
                     {state.playerFilter.val === undefined ? "any player" : state.playerFilter.val!.summonerName}
@@ -387,7 +426,7 @@ function Matches(): JSX.Element {
             </div>
             <div className="sortContainer col centerAll">
                 {state.playerFilter.val === undefined ? null : <button 
-                    className="playerSort clickable" 
+                    className="playerSort clickable whiteWhenHovered" 
                     onClick={() => dispatch({type: "toggleChampionFilter"})}
                 >
                     {state.championFilter.val || "any champion"}

@@ -387,6 +387,7 @@
 .editNameContainer, .editNameContainer svg, .submitPersonName, .submitPersonName svg {
     height: 1rem;
     width: 1rem;
+    transition: color 0s !important;
 }
 
 .submitPersonName {

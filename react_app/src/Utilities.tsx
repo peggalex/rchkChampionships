@@ -100,3 +100,13 @@ export const GetChampDisplayName = (champ: string): string => {
 export const GetItemIconUrl = (iconId: number): string => `https://ddragon.leagueoflegends.com/cdn/11.12.1/img/item/${iconId}.png`;
 export const GetSpellIconUrl = (spellName: string): string => `https://ddragon.leagueoflegends.com/cdn/11.10.1/img/spell/${spellName}.png`;
 export const GetKeystoneIconUrl = (partialUrl: string): string => `https://ddragon.leagueoflegends.com/cdn/img/${partialUrl}`;
+
+//https://stackoverflow.com/questions/1322732/convert-seconds-to-hh-mm-ss-with-javascript
+export const secsToHMS = (secs: number): string => {
+    const hourInSecs = 60*60;
+    let dateStr = new Date(secs * 1000).toISOString();
+    const endIndex = 19;
+    let len = 8;
+    if (secs < hourInSecs) len -= 3;
+    return dateStr.substr(endIndex - len, len);
+};
