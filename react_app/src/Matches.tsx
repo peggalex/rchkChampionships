@@ -93,7 +93,7 @@ function getDaySuffix(day: number){
 
 function Spells({spell1, spell2}: {spell1: string, spell2: string}){
     return <div className="spells col">
-        {[spell1, spell2].map((s, i) => <img className="spell" title={s} src={GetSpellIconUrl(s)} key={i}/>)}
+        {[spell1, spell2].map((s, i) => <img className="spell" src={GetSpellIconUrl(s)} key={i}/>)}
     </div>
 }
 
