@@ -199,3 +199,7 @@ button:disabled{
   }
 
 }
+
+*[title]:hover {
+  cursor: help;
+}

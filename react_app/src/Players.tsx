@@ -118,9 +118,9 @@ export function WinRate({wins, games, isMini}: {wins: number, games: number, isM
             {winRate}%
         </span>
         <div className="noGames statBreakdown">
-            <span className="wins">{wins}</span>
-            <span className="losses">{losses}</span>
-            <span className="totalGames">{games}</span>
+            <span className="wins" title={`Wins: ${wins}`}>{wins}</span>
+            <span className="losses" title={`Losses: ${losses}`}>{losses}</span>
+            <span className="totalGames" title={`Total Games: ${games}`}>{games}</span>
         </div>
     </div>
 }

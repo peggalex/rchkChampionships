@@ -93,7 +93,7 @@ function getDaySuffix(day: number){
 
 function Spells({spell1, spell2}: {spell1: string, spell2: string}){
     return <div className="spells col">
-        {[spell1, spell2].map((s, i) => <img className="spell" src={GetSpellIconUrl(s)} key={i}/>)}
+        {[spell1, spell2].map((s, i) => <img className="spell" title={s} src={GetSpellIconUrl(s)} key={i}/>)}
     </div>
 }
 
@@ -164,16 +164,24 @@ function Match(
                     {isExpanded ? 
                         Array.from(Array(5)).map((_, j) => {
                             let champ: string = (t as any)[`ban${j}`];
-                            return <div className="banContainer">
+                            return <div 
+                                className="banContainer" 
+                                title={`Banned: ${champ === "" ? "None" : champ}`} 
+                            >
                                 <img 
                                     className="generalChampIcon circle" 
-                                    src={champ === "" ? GetProfileIconUrl(29) : GetChampIconUrl(champ)} 
+                                    src={champ === "" ? GetProfileIconUrl(29) : GetChampIconUrl(champ)}
                                     key={j}
                                 />
                                 <div className="banIconContainer">{Icons.Ban}</div>
                             </div>
                         }) :
-                        t.players.map((p, j) => <img className="generalChampIcon circle" src={GetChampIconUrl(p.champion)} key={j}/>)
+                        t.players.map((p, j) => <img 
+                            className="generalChampIcon circle" 
+                            src={GetChampIconUrl(p.champion)} 
+                            title={p.champion}
+                            key={j}
+                        />)
                     }
                 </div>)}</div>
             </div>
@@ -211,7 +219,7 @@ function TeamPlayer({player: p}: {player: ITeamPlayer}): JSX.Element {
         <div className="row centerCross">
             <Spells spell1={p.spell1} spell2={p.spell2}/>
             <div className="teamPlayerChampionIconContainer circle centerAll">
-                <img className="teamPlayerChampionIcon circle" src={GetChampIconUrl(p.champion)}/>
+                <img className="teamPlayerChampionIcon circle" title={p.champion} src={GetChampIconUrl(p.champion)}/>
             </div>
             <img className="keyStone" src={GetKeystoneIconUrl(p.keyStoneUrl)}/>
             <p onClick={()=>history.push(`/players/${p.accountId}`)} className="clickable blueTextHover">{p.summonerName}</p>
