@@ -326,7 +326,7 @@ function Player(
             <div className="collapseIcon">
                 {isExpanded ? Icons.ChevronUp : Icons.ChevronDown}
             </div>
-            <img className="profilePic circle" src={GetProfileIconUrl(iconId)}/>
+            <img className="profilePic circle" loading="lazy" src={GetProfileIconUrl(iconId)}/>
             <Names accountId={accountId} summonerName={summonerName} personName={personName} setIsLoading={setIsLoading}/>
             <div className="playerRightSide col">
                 <div className="mainStats row centerCross">
@@ -379,7 +379,7 @@ function PlayerChampion(
 
     return <div className="champion row centerCross">
         <div className="playerLeftSide row centerCross">
-            <img className="championIcon circle" src={GetChampIconUrl(champion)}/>
+            <img className="championIcon circle" loading="lazy" src={GetChampIconUrl(champion)}/>
             <h2 
                 onClick={() => history.push(`/matches/${accountId}/champion/${champion}`)} 
                 className="champName clickable blueTextHover"

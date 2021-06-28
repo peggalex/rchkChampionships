@@ -93,7 +93,7 @@ function getDaySuffix(day: number){
 
 function Spells({spell1, spell2}: {spell1: string, spell2: string}){
     return <div className="spells col">
-        {[spell1, spell2].map((s, i) => <img className="spell" src={GetSpellIconUrl(s)} key={i}/>)}
+        {[spell1, spell2].map((s, i) => <img className="spell" loading="lazy" src={GetSpellIconUrl(s)} key={i}/>)}
     </div>
 }
 
@@ -101,7 +101,7 @@ function Items({items}: {items: number[]}): JSX.Element {
     return <div className="items">{
         items.map((id, i) => 
             id !== 0 ? 
-                <img className="item" src={GetItemIconUrl(id)} key={i} loading="lazy"/> : 
+                <img className="item" loading="lazy" src={GetItemIconUrl(id)} key={i}/> : 
                 <span className="item noItem"/>
         )
     }</div>
@@ -172,6 +172,7 @@ function Match(
                                     className="generalChampIcon circle" 
                                     src={champ === "" ? GetProfileIconUrl(29) : GetChampIconUrl(champ)}
                                     key={j}
+                                    loading="lazy" 
                                 />
                                 <div className="banIconContainer">{Icons.Ban}</div>
                             </div>
@@ -180,6 +181,7 @@ function Match(
                             className="generalChampIcon circle" 
                             src={GetChampIconUrl(p.champion)} 
                             title={GetChampDisplayName(p.champion)}
+                            loading="lazy" 
                             key={j}
                         />)
                     }
@@ -219,9 +221,18 @@ function TeamPlayer({player: p}: {player: ITeamPlayer}): JSX.Element {
         <div className="row centerCross">
             <Spells spell1={p.spell1} spell2={p.spell2}/>
             <div className="teamPlayerChampionIconContainer circle centerAll">
-                <img className="teamPlayerChampionIcon circle" title={GetChampDisplayName(p.champion)} src={GetChampIconUrl(p.champion)}/>
+                <img 
+                    className="teamPlayerChampionIcon circle" 
+                    title={GetChampDisplayName(p.champion)} 
+                    src={GetChampIconUrl(p.champion)}
+                    loading="lazy" 
+                />
             </div>
-            <img className="keyStone" src={GetKeystoneIconUrl(p.keyStoneUrl)}/>
+            <img 
+                className="keyStone" 
+                src={GetKeystoneIconUrl(p.keyStoneUrl)}
+                loading="lazy"
+            />
             <p onClick={()=>history.push(`/players/${p.accountId}`)} className="clickable blueTextHover">{p.summonerName}</p>
             <div className="teamPlayerRHS col">
                 <Items items={Array.from(Array(6)).map((_, i) => (p as any)[`item${i}`])}/>
