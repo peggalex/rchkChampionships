@@ -371,6 +371,7 @@ h2.teamScore {
     width: 100%;
     transform: scale(1.2);
     height: 100%;
+    opacity: 0.8;
 }
 
 .teamsContainer .totalKda {

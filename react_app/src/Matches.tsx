@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect, useParams, useHistory } from 'react-router-dom';
-import { EnumArray, GetChampIconUrl, RestfulType, CallAPI, GetItemIconUrl, GetSpellIconUrl, GetKeystoneIconUrl, secsToHMS, GetProfileIconUrl } from './Utilities';
+import { EnumArray, GetChampIconUrl, RestfulType, CallAPI, GetItemIconUrl, GetSpellIconUrl, GetKeystoneIconUrl, secsToHMS, GetProfileIconUrl, GetChampDisplayName } from './Utilities';
 import "./Matches.css";
 import Icons from './Icons';
 import Players, { AdditionalStats, KDAStat } from './Players';
@@ -166,7 +166,7 @@ function Match(
                             let champ: string = (t as any)[`ban${j}`];
                             return <div 
                                 className="banContainer" 
-                                title={`Banned: ${champ === "" ? "None" : champ}`} 
+                                title={`Banned: ${champ === "" ? "None" : GetChampDisplayName(champ)}`} 
                             >
                                 <img 
                                     className="generalChampIcon circle" 
@@ -179,7 +179,7 @@ function Match(
                         t.players.map((p, j) => <img 
                             className="generalChampIcon circle" 
                             src={GetChampIconUrl(p.champion)} 
-                            title={p.champion}
+                            title={GetChampDisplayName(p.champion)}
                             key={j}
                         />)
                     }
@@ -219,7 +219,7 @@ function TeamPlayer({player: p}: {player: ITeamPlayer}): JSX.Element {
         <div className="row centerCross">
             <Spells spell1={p.spell1} spell2={p.spell2}/>
             <div className="teamPlayerChampionIconContainer circle centerAll">
-                <img className="teamPlayerChampionIcon circle" title={p.champion} src={GetChampIconUrl(p.champion)}/>
+                <img className="teamPlayerChampionIcon circle" title={GetChampDisplayName(p.champion)} src={GetChampIconUrl(p.champion)}/>
             </div>
             <img className="keyStone" src={GetKeystoneIconUrl(p.keyStoneUrl)}/>
             <p onClick={()=>history.push(`/players/${p.accountId}`)} className="clickable blueTextHover">{p.summonerName}</p>
