@@ -255,17 +255,9 @@
 }
 
 .statBreakdown > * {
-    width: 1.5rem;
-    display: inline-block;
-    text-align: end;
-}
-
-.noGames > * {
-    width: 1.5rem;
-}
-
-.kda > * {
     width: 2rem;
+    display: inline-block;
+    text-align: center;
 }
 
 .kda > .kills, .noGames > .wins {
@@ -290,16 +282,23 @@
 
 .noGames > .totalGames {
     color: var(--grey700);
+    width: 2.5rem;
+    position: relative;
+}
+
+.noGames.statBreakdown {
+    padding-right: 0;
 }
 
 .noGames > .totalGames:before {
     content: "|";
     font-weight: 400;
-    margin-right: 0.5rem;
+    position: absolute;
+    left: 0;
 }
 
 .statBreakdown > span + span {
-    margin-left: 0.75rem;
+    margin-left: 0.5rem;
 }
 
 .collapseIcon > div {

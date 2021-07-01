@@ -370,6 +370,7 @@ h2.teamScore {
 
 .teamsContainer .totalKda {
     width: 4rem;
+    text-align: center;
 }
 
 .kdaContainer.whole .kda > * {

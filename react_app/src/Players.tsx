@@ -119,7 +119,7 @@ export function WinRate({wins, games, isMini}: {wins: number, games: number, isM
     let winRate = (100 * (wins / games)).toFixed(0);
 
     return <div className={`winRateContainer statContainer ${isMini ? "mini" : "large"}`}>
-        <span className="winRateTotal mainStat">
+        <span className="winRateTotal mainStat" title={`Winrate: ${winRate}%`}>
             {winRate}%
         </span>
         <div className="noGames statBreakdown">
@@ -136,7 +136,7 @@ export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: numbe
     let formatKDA = (n: number) => n.toFixed(isWhole ? 0 : 1);
 
     return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"}`}>
-        <span className="totalKda mainStat">
+        <span className="totalKda mainStat" title={`KDA ratio: ${totalKda}`}>
             {totalKda}
         </span>
         <div className="kda statBreakdown">
@@ -148,7 +148,10 @@ export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: numbe
 }
 
 export function CreepScore({cs, isMini}: {cs: number, isMini: boolean}){
-    return <span className={`csMin mainStat ${isMini ? "mini" : "large"}`}>
+    return <span 
+        className={`csMin mainStat ${isMini ? "mini" : "large"}`} 
+        title={`Creep Score / min: ${cs.toFixed(1)}`}
+    >
         {cs.toFixed(1)}
     </span>
 }
