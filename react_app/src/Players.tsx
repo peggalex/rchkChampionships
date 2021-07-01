@@ -21,6 +21,11 @@ const kdaSort = {
 
 const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
     winRateSort,
+    {
+        name: "wins",
+        sort: NumericCompareFunc((p: IPlayer) =>  p.allAvgs.wins),
+        desc: true
+    },
     kdaSort,
     {
         name: "cs",
@@ -48,6 +53,16 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
         desc: true
     },
     {
+        name: 'champs played',
+        sort: NumericCompareFunc((p: IPlayer) => p.championAvgs.length),
+        desc: true
+    },
+    {
+        name: 'games played',
+        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.noGames),
+        desc: true
+    },
+    {
         name: 'name', 
         sort: (a: IPlayer, b: IPlayer) => {
             let [aName, bName] = [a.summonerName, b.summonerName];
@@ -61,16 +76,6 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
             return NumericCompareFunc((x: string) => x.length)(aName, bName);
         }, 
         desc: false
-    },
-    {
-        name: 'champs played',
-        sort: NumericCompareFunc((p: IPlayer) => p.championAvgs.length),
-        desc: true
-    },
-    {
-        name: 'games played',
-        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.noGames),
-        desc: true
     }
 ];
 
