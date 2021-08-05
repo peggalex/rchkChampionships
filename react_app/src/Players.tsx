@@ -147,12 +147,13 @@ export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: numbe
     </div>
 }
 
-export function CreepScore({cs, isMini}: {cs: number, isMini: boolean}){
+export function CreepScore({cs, isMini, isWhole = false}: {cs: number, isMini: boolean, isWhole?: boolean}){
+    let formatCs = cs.toFixed(isWhole ? 0 : 1);
     return <span 
-        className={`csMin mainStat ${isMini ? "mini" : "large"}`} 
-        title={`Creep Score / min: ${cs.toFixed(1)}`}
+        className={`csMin mainStat ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"}`} 
+        title={`Creep Score${isWhole ? '' : `/ min: ${formatCs}`}`}
     >
-        {cs.toFixed(1)}
+        {formatCs}
     </span>
 }
 
@@ -224,8 +225,9 @@ function EditPersonName({accountId, name, setIsLoading, goBack}: {accountId: num
             return goBack();
         }
 
+        let urlEncodedName = encodeURIComponent(personName);
         setIsLoading(true);
-        CallAPI(`/setAccountPersonName/${accountId}/personName/${personName}`, RestfulType.POST)
+        CallAPI(`/setAccountPersonName/${accountId}/personName/${urlEncodedName}`, RestfulType.POST)
         .then(() => {
             if (window.confirm(`Successfully changed name to '${personName}', reload page?`)){
                 window.location.href = `${window.location.origin}${process.env.PUBLIC_URL}/players/${accountId}`;
@@ -246,7 +248,6 @@ function EditPersonName({accountId, name, setIsLoading, goBack}: {accountId: num
         <input 
             pattern="[\dA-Za-z ]{1,16}" 
             maxLength={16}
-            title="Alphanumeric and spaces (up to 16 characters)" 
             ref={nameRef} 
             value={personName} 
             onClick={(e: any) => e.stopPropagation()}
@@ -260,7 +261,15 @@ function EditPersonName({accountId, name, setIsLoading, goBack}: {accountId: num
     </div>
 }
 
-function Names({accountId, summonerName, personName, setIsLoading}: {accountId: number, summonerName: string, personName: string|null, setIsLoading: (isLoading: boolean) => void}){
+function Names(
+    {accountId, summonerName, personName, setIsLoading}: 
+    {
+        accountId: number, 
+        summonerName: string, 
+        personName: string|null, 
+        setIsLoading: (isLoading: boolean) => void
+    }
+){
     const history = useHistory();
 
     const [isEditMode, setIsEditMode] = React.useState(personName == null);
@@ -334,8 +343,13 @@ function Player(
             <div className="collapseIcon">
                 {isExpanded ? Icons.ChevronUp : Icons.ChevronDown}
             </div>
-            <img className="profilePic circle" loading="lazy" src={GetProfileIconUrl(iconId)}/>
-            <Names accountId={accountId} summonerName={summonerName} personName={personName} setIsLoading={setIsLoading}/>
+            <img className="profilePic circle" src={GetProfileIconUrl(iconId)}/>
+            <Names 
+                accountId={accountId} 
+                summonerName={summonerName} 
+                personName={personName} 
+                setIsLoading={setIsLoading}
+            />
             <div className="playerRightSide col">
                 <div className="mainStats row centerCross">
                     <WinRate wins={wins} games={noGames} isMini={false}/>
@@ -387,7 +401,7 @@ function PlayerChampion(
 
     return <div className="champion row centerCross">
         <div className="playerLeftSide row centerCross">
-            <img className="championIcon circle" loading="lazy" src={GetChampIconUrl(champion)}/>
+            <img className="championIcon circle" src={GetChampIconUrl(champion)}/>
             <h2 
                 onClick={() => history.push(`/matches/${accountId}/champion/${champion}`)} 
                 className="champName clickable blueTextHover"
@@ -431,7 +445,6 @@ function Players(): JSX.Element {
             let res = await CallAPI("/getPlayerStats", RestfulType.GET);
             PLAYERS = res["res"];
         }
-        console.log('setting isloading to false');
         setIsLoading(false);
         setPlayersSorted(PLAYERS);
     }

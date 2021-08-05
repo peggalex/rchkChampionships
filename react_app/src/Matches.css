@@ -159,10 +159,18 @@ h2.matchMonth {
     z-index: 1;
 }
 
-.teamPlayer .totalKda {
-    margin-left: 0.5rem;
+.teamPlayer .csMin{
+    width: 3.5rem;
+}
+
+.teamPlayer .totalKda, .teamPlayer .csMin{
     margin-right: -0.25rem;
     font-size: 1rem;
+}
+
+.teamPlayer .totalKda:after, .teamPlayer .csMin:after{
+    font-size: 0.65rem;
+    margin-left: 0.3rem;
 }
 
 .teamPlayer .statBreakdown{

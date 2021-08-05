@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, Redirect, useParams, useH
 import { EnumArray, GetChampIconUrl, RestfulType, CallAPI, GetItemIconUrl, GetSpellIconUrl, GetKeystoneIconUrl, secsToHMS, GetProfileIconUrl, GetChampDisplayName } from './Utilities';
 import "./Matches.css";
 import Icons from './Icons';
-import Players, { AdditionalStats, KDAStat } from './Players';
+import Players, { AdditionalStats, CreepScore, KDAStat } from './Players';
 import Medals from './Medals';
 
 interface IPlayer {
@@ -93,7 +93,7 @@ function getDaySuffix(day: number){
 
 function Spells({spell1, spell2}: {spell1: string, spell2: string}){
     return <div className="spells col">
-        {[spell1, spell2].map((s, i) => <img className="spell" loading="lazy" src={GetSpellIconUrl(s)} key={i}/>)}
+        {[spell1, spell2].map((s, i) => <img className="spell" src={GetSpellIconUrl(s)} key={i}/>)}
     </div>
 }
 
@@ -101,7 +101,7 @@ function Items({items}: {items: number[]}): JSX.Element {
     return <div className="items">{
         items.map((id, i) => 
             id !== 0 ? 
-                <img className="item" loading="lazy" src={GetItemIconUrl(id)} key={i}/> : 
+                <img className="item" src={GetItemIconUrl(id)} key={i}/> : 
                 <span className="item noItem"/>
         )
     }</div>
@@ -172,7 +172,6 @@ function Match(
                                     className="generalChampIcon circle" 
                                     src={champ === "" ? GetProfileIconUrl(29) : GetChampIconUrl(champ)}
                                     key={j}
-                                    loading="lazy" 
                                 />
                                 <div className="banIconContainer">{Icons.Ban}</div>
                             </div>
@@ -181,7 +180,6 @@ function Match(
                             className="generalChampIcon circle" 
                             src={GetChampIconUrl(p.champion)} 
                             title={GetChampDisplayName(p.champion)}
-                            loading="lazy" 
                             key={j}
                         />)
                     }
@@ -225,13 +223,11 @@ function TeamPlayer({player: p}: {player: ITeamPlayer}): JSX.Element {
                     className="teamPlayerChampionIcon circle" 
                     title={GetChampDisplayName(p.champion)} 
                     src={GetChampIconUrl(p.champion)}
-                    loading="lazy" 
                 />
             </div>
             <img 
                 className="keyStone" 
                 src={GetKeystoneIconUrl(p.keyStoneUrl)}
-                loading="lazy"
             />
             <p onClick={()=>history.push(`/players/${p.accountId}`)} className="clickable blueTextHover">{p.summonerName}</p>
             <div className="teamPlayerRHS col">
@@ -241,6 +237,7 @@ function TeamPlayer({player: p}: {player: ITeamPlayer}): JSX.Element {
         </div>
         <div className="row centerCross">
             <KDAStat k={p.kills} d={p.deaths} a={p.assists} isMini={true} isWhole={true}/>
+            <CreepScore cs={p.cs} isMini={true} isWhole={true}/>
             <AdditionalStats kp={p.kp} dmgDealt={p.dmgDealt} dmgTaken={p.dmgTaken} gold={p.gold} isPerMin={false}/>
         </div>
     </div>
