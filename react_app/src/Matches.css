@@ -165,7 +165,7 @@ h2.matchMonth {
 
 .teamPlayer .totalKda, .teamPlayer .csMin{
     margin-right: -0.25rem;
-    font-size: 1rem;
+    font-size: 0.8rem;
 }
 
 .teamPlayer .totalKda:after, .teamPlayer .csMin:after{
@@ -187,7 +187,6 @@ h2.matchMonth {
 
 .teamPlayer .totalKda {
     margin-left: 0.25rem;
-    font-size: 1rem;
     margin-right: -0.35rem;
 }
 
