@@ -117,11 +117,12 @@ interface IPlayer {
 
 export function WinRate({wins, games, isMini}: {wins: number, games: number, isMini: boolean}){
     let losses = games - wins;
-    let winRate = (100 * (wins / games)).toFixed(0);
+    let winRate = Math.round(100*wins/games);
+    let winRateDisplay = winRate.toFixed(0);
 
     return <div className={`winRateContainer statContainer ${isMini ? "mini" : "large"}`}>
-        <span className="winRateTotal mainStat" title={`Winrate: ${winRate}%`}>
-            {winRate}%
+        <span className={`winRateTotal mainStat ${70 <= winRate ? 'gold' : ''}`} title={`Winrate: ${winRate}%`}>
+            {winRateDisplay}%
         </span>
         <div className="noGames statBreakdown">
             <span className="wins" title={`Wins: ${wins}`}>{wins}</span>
@@ -137,7 +138,7 @@ export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: numbe
     let formatKDA = (n: number) => n.toFixed(isWhole ? 0 : 1);
 
     return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"}`}>
-        <span className={`totalKda mainStat ${d == 0 ? 'inf' : ''}`} title={`KDA ratio: ${totalKda}`}>
+        <span className={`totalKda mainStat ${d == 0 ? 'inf' : 4 <= (k+a)/d ? 'gold' : ''}`} title={`KDA ratio: ${totalKda}`}>
             {totalKda}
         </span>
         <div className="kda statBreakdown">

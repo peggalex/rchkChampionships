@@ -237,11 +237,11 @@
     width: 6rem;
 }
 
-.csMin.mainStat.gold {
+.mainStat.gold {
     color: var(--teal500);
 }
 
-.csMin.mainStat.gold:after {
+.mainStat.gold:after {
     color: var(--teal600);
 }
 
