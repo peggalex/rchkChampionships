@@ -229,12 +229,20 @@ p.matchIndex:after {
     color: var(--grey500);
 }
 
+.medalContainer.gold .medalIcon > svg, .medalIcon {
+    color: var(--yellow500);
+}
+
 .medalContainer > p {
     margin: 0;
     color: var(--grey700);
     font-size: 0.5rem;
     align-self: flex-end;
     margin-left: 0.1rem;
+}
+
+.medalContainer.gold > p {
+    color: var(--yellow600);
 }
 
 .medalContainer > p:before {

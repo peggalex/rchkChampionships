@@ -229,8 +229,20 @@
     color: var(--grey600); 
 }
 
+.totalKda.mainStat.inf:after {
+    color: var(--yellow600);
+}
+
 .csMin {
     width: 6rem;
+}
+
+.csMin.mainStat.gold {
+    color: var(--teal500);
+}
+
+.csMin.mainStat.gold:after {
+    color: var(--teal600);
 }
 
 .csMin.mini {
@@ -280,6 +292,10 @@
     content: "L"
 }
 
+.totalKda.mainStat.inf {
+    color: var(--yellow500);
+}
+
 .kda > .assists {
     color: var(--blue);
 }
@@ -321,9 +337,17 @@
     margin-top: 0.75rem;
 }
 
+.additionalStats .gold {
+    color: var(--teal600);
+}
+
 .additionalStats {
     width: 26.5rem;
     align-self: flex-end;
+}
+
+.champion .additionalStats {
+    width: calc(26.5rem*5/4); /* champions also have bans */
 }
 
 .additionalStats > div {
@@ -337,6 +361,10 @@
     color: var(--grey500);
     margin-top: -0.1rem;
     stroke-width: 2.5;
+}
+
+.gold > .additionalStatIcon > svg{
+    color: var(--teal500);
 }
 /*
 .champion:not(:hover) .additionalStats {

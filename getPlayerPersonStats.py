@@ -29,15 +29,17 @@ def getStats(cursor: SqliteDB, groupBy: Column):
             {','.join((f'AVG(({c.name}*60.0)/{MATCH_LENGTH_COL.name}) AS {colToAvgName(c)}' for c in avgColumnsPerMin))}
         FROM
             {TEAMPLAYER_TABLE.name} tp 
-                JOIN {PLAYER_TABLE.name} p ON tp.{PLAYER_ACCOUNTID_COL.name} = p.{PLAYER_ACCOUNTID_COL.name}
-                JOIN {MATCH_TABLE.name} m ON tp.{MATCH_MATCHID_COL.name} = m.{MATCH_MATCHID_COL.name}
+                JOIN {PLAYER_TABLE.name} p 
+                    ON tp.{PLAYER_ACCOUNTID_COL.name} = p.{PLAYER_ACCOUNTID_COL.name}
+                JOIN {MATCH_TABLE.name} m 
+                    ON tp.{MATCH_MATCHID_COL.name} = m.{MATCH_MATCHID_COL.name}
         WHERE p.{groupBy.name} IS NOT NULL
         GROUP BY p.{groupBy.name}, {TEAMPLAYER_CHAMPION_COL.name}
         ORDER BY 
             {groupBy.name}, 
             COUNT(*) DESC, 
-            AVG({TEAMPLAYER_DEATHS_COL.name}) = 0 DESC,
             {winsQuery} DESC, 
+            AVG({TEAMPLAYER_DEATHS_COL.name}) = 0 DESC,
             {kdaQuery} DESC
     """
 
@@ -74,6 +76,28 @@ def getStats(cursor: SqliteDB, groupBy: Column):
             champStat = avgChampStats[i] 
             if champStat[groupBy.name] == groupKey:
                 accounts[champStat[PLAYER_ACCOUNTID_COL.name]] = champStat[PLAYER_SUMMONERNAME_COL.name]
+
+                champion = champStat[TEAMPLAYER_CHAMPION_COL.name]
+                banRateName = "banRate"
+                noBansQuery = f"SUM(CASE WHEN '{champion}' IN ({','.join((c.name for c in TEAM_BAN_COLS))}) THEN 1 ELSE 0 END)"
+                banRateQuery = f"CAST({noBansQuery} AS FLOAT)/CAST(COUNT(*) AS FLOAT)"
+
+                banRate = cursor.Fetch(f"""
+                    SELECT {banRateQuery} AS {banRateName}
+                    FROM (
+                        SELECT {MATCH_MATCHID_COL.name}, {TEAMPLAYER_ISREDSIDE_COL.name}
+                        FROM {TEAMPLAYER_TABLE.name} tp
+                            JOIN {PLAYER_TABLE.name} p 
+                                ON tp.{PLAYER_ACCOUNTID_COL.name} = p.{PLAYER_ACCOUNTID_COL.name}
+                        WHERE p.{groupBy.name} = '{champStat[groupBy.name]}'
+                    ) champMatches 
+                        JOIN {TEAM_TABLE.name} t
+                            ON champMatches.{MATCH_MATCHID_COL.name} = t.{MATCH_MATCHID_COL.name}
+                                AND champMatches.{TEAMPLAYER_ISREDSIDE_COL.name} <> t.{TEAMPLAYER_ISREDSIDE_COL.name}
+                """)[banRateName]
+
+                champStat[banRateName] = banRate
+
                 # get rid of fields stored in parent
                 for c in playerColumns:
                     champStat.pop(c.name)

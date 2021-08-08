@@ -101,8 +101,7 @@ interface IAvg {
 }
 
 interface IChampionAvg extends IAvg {
-    champion: string,
-    banRate: number
+    champion: string
 }
 
 interface IPlayer {
@@ -137,7 +136,7 @@ export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: numbe
     let formatKDA = (n: number) => n.toFixed(isWhole ? 0 : 1);
 
     return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"}`}>
-        <span className={`totalKda mainStat ${d == 0 ? 'inf' : ''}`} title={`KDA ratio: ${totalKda}`}>
+        <span className="totalKda mainStat" title={`KDA ratio: ${totalKda}`}>
             {totalKda}
         </span>
         <div className="kda statBreakdown">
@@ -148,27 +147,23 @@ export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: numbe
     </div>
 }
 
-export function CreepScore({cs, isMini, isWhole = false, gameLength}: {cs: number, isMini: boolean, isWhole?: boolean, gameLength?: number}){
+export function CreepScore({cs, isMini, isWhole = false}: {cs: number, isMini: boolean, isWhole?: boolean}){
     let formatCs = cs.toFixed(isWhole ? 0 : 1);
-    let csMin = isWhole ? 60 / (gameLength ?? -1) * cs : cs;
-    let isGold = 7.5 <= csMin;
     return <span 
-        className={`csMin mainStat ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"} ${isGold ? 'gold' : 'notGold'}`} 
-        title={isWhole ? `Creep Score: ${formatCs} (${csMin.toFixed(1)}/m)` : `Creep Score / min: ${formatCs}`}
+        className={`csMin mainStat ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"}`} 
+        title={`Creep Score${isWhole ? '' : `/ min: ${formatCs}`}`}
     >
         {formatCs}
     </span>
 }
 
 export function AdditionalStats({
-        banRate,
         kp, 
         dmgDealt, 
         dmgTaken, 
         gold, 
         isPerMin
     }: {
-        banRate?: number,
         kp: number,
         dmgDealt: number, 
         dmgTaken: number, 
@@ -179,43 +174,30 @@ export function AdditionalStats({
     const formatStat = (n: number) => Math.round(n).toLocaleString("en");
 
     let data = [
-        {
-            icon: Icons.KillParticipationIcon,
-            value: `${Math.round(kp)}%`,
-            label: "Kill Participation",
-            isGold: 70 <= Math.round(kp)
-        },
-        {
-            icon: Icons.DmgDealtIcon,
-            value: formatStat(dmgDealt),
-            label: `Damage Dealt${isPerMin ? ' / min' : ""}`,
-        },
-        {
-            icon: Icons.DmgTakenIcon,
-            value: formatStat(dmgTaken),
-            label: `Damage Taken${isPerMin ? ' / min' : ""}`
-        },
-        {
-            icon: Icons.GoldIcon,
-            value: formatStat(gold),
-            label: `Gold${isPerMin ? ' / min' : ""}`
-        }
-    ];
-
-    if (banRate != null){
-        data = [{
-            icon: Icons.BanRate,
-            value: `${Math.round(banRate*100)}%`,
-            label: "Ban Rate (enemy team)"
-        }, ...data];
+    {
+        icon: Icons.KillParticipationIcon,
+        value: `${Math.round(kp)}%`,
+        label: "Kill Participation"
+    },
+    {
+        icon: Icons.DmgDealtIcon,
+        value: formatStat(dmgDealt),
+        label: `Damage Dealt${isPerMin ? ' / min' : ""}`
+    },
+    {
+        icon: Icons.DmgTakenIcon,
+        value: formatStat(dmgTaken),
+        label: `Damage Taken${isPerMin ? ' / min' : ""}`
+    },
+    {
+        icon: Icons.GoldIcon,
+        value: formatStat(gold),
+        label: `Gold${isPerMin ? ' / min' : ""}`
     }
+    ]
 
     return <div className="additionalStats row centerCross spaceAround">
-        {data.map((d, i) => <div 
-            className={`row centerAll ${(d.isGold ?? false) ? 'gold' : 'notGold'}`} 
-            title={`${d.label}: ${d.value}`} 
-            key={i}
-        >
+        {data.map((d, i) => <div className="row centerAll" title={`${d.label}: ${d.value}`} key={i}>
             <div className="additionalStatIcon row centerAll">{d.icon}</div>
             <div>{d.value}</div>
         </div>
@@ -392,8 +374,6 @@ function Player(
 function PlayerChampion(
     {championAvg: {
         champion,
-        banRate,
-
         avgKills, 
         avgDeaths, 
         avgAssists, 
@@ -434,7 +414,7 @@ function PlayerChampion(
                 <CreepScore cs={avgCs} isMini={true}/>
             </div>
         </div>
-        <AdditionalStats banRate={banRate} kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
+        <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
         <Medals doubles={doubles} triples={triples} quadras={quadras} pentas={pentas} turrets={turrets} inhibs={inhibs} firstBloods={firstBlood}/>
     </div>
 }

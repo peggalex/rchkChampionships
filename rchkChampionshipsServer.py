@@ -4,6 +4,7 @@ from flask import *
 from addMatch import addMatch
 from getMatch import getMatches
 from getPlayerPersonStats import getPlayerStats, getPersonStats
+from getChampionStats import getChampionStats
 from setAccountPersonName import setAccountPersonName
 from SqliteLib import SqliteDB
 import quopri
@@ -12,17 +13,22 @@ import webarchive
 import os
 import tempfile
 import re
+from sqlite3 import OperationalError as sqlite3Error
 
 notFlaskLogging.basicConfig(level=notFlaskLogging.DEBUG)
 app = Flask(__name__, static_folder='./react_app/build/static', template_folder="./react_app/build")
 
 def handleException(cursor, e):
+    lastQuery = cursor.lastQuery # save before rollback
     cursor.Rollback()
     traceback.print_exc()
     if type(e) == BadRequestException:
         return {"error": f"{str(e)}"}, 400
     else:
-        return {"error": f"Server Error: {str(type(e))} -- {str(e)}"}, 500
+        errorMsg = f"Server Error: {str(type(e))} -- {str(e)}"
+        if type(e) == sqlite3Error:
+            errorMsg += f"\n\tlast query: {lastQuery}"
+        return {"error": errorMsg}, 500
 
 
 
@@ -115,6 +121,15 @@ def getPersonStatsEndpoint():
     with SqliteDB() as cursor:
         try:
             return {"res": getPersonStats(cursor)}, 200
+        except Exception as e:
+            return handleException(cursor, e)
+        
+@app.route('/getChampionStats', methods=['GET'])
+def getChampionStatsEndpoint():
+
+    with SqliteDB() as cursor:
+        try:
+            return {"res": getChampionStats(cursor)}, 200
         except Exception as e:
             return handleException(cursor, e)
 

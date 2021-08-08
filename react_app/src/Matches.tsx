@@ -189,7 +189,7 @@ function Match(
             <a className="matchHistory centerAll" href={matchLink} target="_blank">{Icons.Link}</a>
         </div>
         {isExpanded ? <div className="teamsContainer row">
-            {[redSide, blueSide].map((t, i) => <Team team={t} redSideWon={redSideWon} key={i}/>)}
+            {[redSide, blueSide].map((t, i) => <Team team={t} redSideWon={redSideWon} gameLength={length} key={i}/>)}
             <div className="teamsShadow accordionShadow"></div>
         </div> : null}
     </div>
@@ -201,18 +201,19 @@ function Team(
         isRedSide,
         players
     }, 
-    redSideWon
+    redSideWon,
+    gameLength
 }:
-    {team: ITeam, redSideWon: boolean}
+    {team: ITeam, redSideWon: boolean, gameLength: number}
 ): JSX.Element {
 
     let won = redSideWon == isRedSide;
     return <div className={`team spacer ${won ? "won" : "lost"} col`}>
-        {players.map((p, i) => <TeamPlayer player={p} key={i}/>)}
+        {players.map((p, i) => <TeamPlayer player={p} gameLength={gameLength} key={i}/>)}
     </div>
 }
 
-function TeamPlayer({player: p}: {player: ITeamPlayer}): JSX.Element {
+function TeamPlayer({player: p, gameLength}: {player: ITeamPlayer, gameLength: number}): JSX.Element {
 
     const history = useHistory();
     return <div className="teamPlayer col">
@@ -237,7 +238,7 @@ function TeamPlayer({player: p}: {player: ITeamPlayer}): JSX.Element {
         </div>
         <div className="row centerCross">
             <KDAStat k={p.kills} d={p.deaths} a={p.assists} isMini={true} isWhole={true}/>
-            <CreepScore cs={p.cs} isMini={true} isWhole={true}/>
+            <CreepScore cs={p.cs} isMini={true} isWhole={true} gameLength={gameLength}/>
             <AdditionalStats kp={p.kp} dmgDealt={p.dmgDealt} dmgTaken={p.dmgTaken} gold={p.gold} isPerMin={false}/>
         </div>
     </div>
@@ -459,7 +460,7 @@ function Matches(): JSX.Element {
                         />
                         {state.playerFilter.val!.champions.map((c, i) => 
                             <SortOption 
-                                label={c}
+                                label={GetChampDisplayName(c)}
                                 onClick={() => dispatch({
                                     type: "setChampionFilter", 
                                     payload: {...state, championFilter: {...state.championFilter, val: c}}
