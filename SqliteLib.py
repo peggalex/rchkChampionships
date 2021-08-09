@@ -172,13 +172,14 @@ class SqliteDB():
         self.connection.isolation_level = None
         self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()
+        self.lastQuery = ""
         self.Execute("BEGIN")
         
     def __enter__(self):
         return self
 
     def Execute(self, query: str):
-        #print(query)
+        self.lastQuery = query
         self.cursor.execute(query)
 
     def InsertIntoTable(self, table: Table, columnValues: 'dict{column: list[columnValues]}'):

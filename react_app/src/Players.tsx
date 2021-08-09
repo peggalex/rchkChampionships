@@ -100,7 +100,7 @@ interface IAvg {
     inhibs: number
 }
 
-interface IChampionAvg extends IAvg {
+export interface IChampionAvg extends IAvg {
     champion: string,
     banRate: number
 }
@@ -121,7 +121,7 @@ export function WinRate({wins, games, isMini}: {wins: number, games: number, isM
     let winRateDisplay = winRate.toFixed(0);
 
     return <div className={`winRateContainer statContainer ${isMini ? "mini" : "large"}`}>
-        <span className={`winRateTotal mainStat ${70 <= winRate ? 'gold' : ''}`} title={`Winrate: ${winRate}%`}>
+        <span className={`winRateTotal mainStat ${90 <= winRate ? 'gold' : 70 <= winRate ? 'blue' : ''}`} title={`Winrate: ${winRate}%`}>
             {winRateDisplay}%
         </span>
         <div className="noGames statBreakdown">
@@ -138,7 +138,7 @@ export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: numbe
     let formatKDA = (n: number) => n.toFixed(isWhole ? 0 : 1);
 
     return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"}`}>
-        <span className={`totalKda mainStat ${d == 0 ? 'inf' : 4 <= (k+a)/d ? 'gold' : ''}`} title={`KDA ratio: ${totalKda}`}>
+        <span className={`totalKda mainStat ${d == 0 ? 'gold' : 4 <= (k+a)/d ? 'blue' : ''}`} title={`KDA ratio: ${totalKda}`}>
             {totalKda}
         </span>
         <div className="kda statBreakdown">
@@ -152,9 +152,10 @@ export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: numbe
 export function CreepScore({cs, isMini, isWhole = false, gameLength}: {cs: number, isMini: boolean, isWhole?: boolean, gameLength?: number}){
     let formatCs = cs.toFixed(isWhole ? 0 : 1);
     let csMin = isWhole ? 60 / (gameLength ?? -1) * cs : cs;
-    let isGold = 7.5 <= csMin;
+    let isBlue = 7.5 <= csMin && csMin < 9;
+    let isGold = 9 <= csMin;
     return <span 
-        className={`csMin mainStat ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"} ${isGold ? 'gold' : 'notGold'}`} 
+        className={`csMin mainStat ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"} ${isGold ? 'gold' : isBlue ? 'blue' : ''}`} 
         title={isWhole ? `Creep Score: ${formatCs} (${csMin.toFixed(1)}/m)` : `Creep Score / min: ${formatCs}`}
     >
         {formatCs}
@@ -184,7 +185,8 @@ export function AdditionalStats({
             icon: Icons.KillParticipationIcon,
             value: `${Math.round(kp)}%`,
             label: "Kill Participation",
-            isGold: 70 <= Math.round(kp)
+            isGold: 95 <= Math.round(kp),
+            isBlue: 70 <= Math.round(kp) && Math.round(kp) < 95
         },
         {
             icon: Icons.DmgDealtIcon,
@@ -207,13 +209,15 @@ export function AdditionalStats({
         data = [{
             icon: Icons.BanRate,
             value: `${Math.round(banRate*100)}%`,
-            label: "Ban Rate (enemy team)"
+            label: "Ban Rate (enemy team)",
+            isGold: 50 <= Math.round(banRate*100),
+            isBlue: 25 <= Math.round(banRate*100) && Math.round(banRate*100) < 50
         }, ...data];
     }
 
     return <div className="additionalStats row centerCross spaceAround">
         {data.map((d, i) => <div 
-            className={`row centerAll ${(d.isGold ?? false) ? 'gold' : 'notGold'}`} 
+            className={`row centerAll ${(d.isGold ?? false) ? 'gold' : (d.isBlue ?? false) ? 'blue' : ''}`} 
             title={`${d.label}: ${d.value}`} 
             key={i}
         >

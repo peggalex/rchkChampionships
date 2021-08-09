@@ -146,7 +146,7 @@ footer {
 
 @media (max-width: 600px) {
   html {
-    font-size: 7px;
+    font-size: 6.9px; /* boytoy's name wont fit on player screen at 7px, too goddamn long */
   }
 }
 

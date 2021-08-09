@@ -229,7 +229,7 @@
     color: var(--grey600); 
 }
 
-.totalKda.mainStat.inf:after {
+.mainStat.gold:after {
     color: var(--yellow600);
 }
 
@@ -237,11 +237,11 @@
     width: 6rem;
 }
 
-.mainStat.gold {
+.mainStat.blue {
     color: var(--teal500);
 }
 
-.mainStat.gold:after {
+.mainStat.blue:after {
     color: var(--teal600);
 }
 
@@ -292,7 +292,7 @@
     content: "L"
 }
 
-.totalKda.mainStat.inf {
+.mainStat.gold {
     color: var(--yellow500);
 }
 
@@ -337,8 +337,12 @@
     margin-top: 0.75rem;
 }
 
-.additionalStats .gold {
+.additionalStats .blue {
     color: var(--teal600);
+}
+
+.additionalStats .gold {
+    color: var(--yellow600);
 }
 
 .additionalStats {
@@ -364,6 +368,10 @@
 }
 
 .gold > .additionalStatIcon > svg{
+    color: var(--yellow500);
+}
+
+.blue > .additionalStatIcon > svg{
     color: var(--teal500);
 }
 /*
