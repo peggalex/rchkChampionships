@@ -36,7 +36,7 @@ function Medals({
         [
             {icon: Icons.Penta, count: pentas, label: "Penta Kills", isGold: true},
             {icon: Icons.Quadra, count: quadras, label: "Quadra Kills", isBlue: true},
-            {icon: Icons.Triple, count: triples, label: "Triple Kills"},
+            {icon: Icons.Triple, count: triples, label: "Triple Kills", isBlue: true},
             {icon: Icons.Double, count: doubles, label: "Double Kills"},
             {icon: Icons.Tower, count: turrets, label: "Towers Killed"},
             {icon: Icons.Inhib, count: inhibs, label: "Inhibitors Killed"},
