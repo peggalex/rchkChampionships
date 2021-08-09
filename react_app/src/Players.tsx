@@ -121,7 +121,7 @@ export function WinRate({wins, games, isMini}: {wins: number, games: number, isM
     let winRateDisplay = winRate.toFixed(0);
 
     return <div className={`winRateContainer statContainer ${isMini ? "mini" : "large"}`}>
-        <span className={`winRateTotal mainStat ${100 == winRate ? 'pink' : 90 <= winRate ? 'gold' : 70 <= winRate ? 'blue' : ''}`} title={`Winrate: ${winRate}%`}>
+        <span className={`winRateTotal mainStat ${100 == winRate && 3 <= wins ? 'pink' : 90 <= winRate ? 'gold' : 70 <= winRate ? 'blue' : ''}`} title={`Winrate: ${winRate}%`}>
             {winRateDisplay}%
         </span>
         <div className="noGames statBreakdown">
@@ -136,7 +136,7 @@ export function WinRate({wins, games, isMini}: {wins: number, games: number, isM
 export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: number, a: number, isMini: boolean, isWhole?: boolean}){
     let totalKda = d == 0 ?  "∞ " : ((k + a)/d).toFixed(isMini ? 1 : 2);
     let formatKDA = (n: number) => n.toFixed(isWhole ? 0 : 1);
-    let isPink = d == 0 && 4 <= (k+a);
+    let isPink = d == 0 && 5 <= (k+a);
     let isGold = 10 <= (k+a)/d;
     let isBlue = 4 <= (k+a)/d;
 
