@@ -2,10 +2,10 @@ import React from 'react';
 import Icons from './Icons';
 
 function Medal(
-        {icon, count, label, isGold = false}: 
-        {icon: JSX.Element, count: number, label: string, isGold?: boolean}
+        {icon, count, label, isGold = false, isBlue = false}: 
+        {icon: JSX.Element, count: number, label: string, isGold?: boolean, isBlue?: boolean}
     ){
-    return <div className={`medalContainer row centerCross ${isGold ? "gold" : "notGold"}`} title={`${label} x${count}`}>
+    return <div className={`medalContainer row centerCross ${isGold ? "gold" : isBlue ? "blue" : ""}`} title={`${label} x${count}`}>
         <div className="medalIcon centerAll">{icon}</div>
         <p>{count}</p>
     </div>
@@ -35,7 +35,7 @@ function Medals({
     return <div className="medalsContainer row centerCross">{
         [
             {icon: Icons.Penta, count: pentas, label: "Penta Kills", isGold: true},
-            {icon: Icons.Quadra, count: quadras, label: "Quadra Kills"},
+            {icon: Icons.Quadra, count: quadras, label: "Quadra Kills", isBlue: true},
             {icon: Icons.Triple, count: triples, label: "Triple Kills"},
             {icon: Icons.Double, count: doubles, label: "Double Kills"},
             {icon: Icons.Tower, count: turrets, label: "Towers Killed"},
@@ -45,7 +45,7 @@ function Medals({
             {icon: Icons.Baron, count: barons, label: "Barons"},
         ]
         .filter(({count}) => 0 < count)
-        .map(({icon, count, label, isGold = false}, i) => <Medal icon={icon} count={count} label={label} isGold={isGold} key={i}/>)
+        .map(({icon, count, label, isGold = false, isBlue = false}, i) => <Medal icon={icon} count={count} label={label} isGold={isGold} isBlue={isBlue} key={i}/>)
     }</div>
 }
 
