@@ -79,7 +79,7 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
     }
 ];
 
-interface IAvg {
+export interface IAvg {
     avgKills: number,
     avgDeaths: number,
     avgAssists: number,

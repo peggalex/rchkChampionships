@@ -4,7 +4,7 @@ import { GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI, NumericComp
 import "./People.css";
 import Icons from './Icons';
 import Medals from './Medals';
-import { AdditionalStats, CreepScore, KDAStat, WinRate } from './Players';
+import { AdditionalStats, CreepScore, IAvg, IChampionAvg, KDAStat, WinRate } from './Players';
 
 const winRateSort = {
     name: 'winrate', 
@@ -79,31 +79,6 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
         desc: false
     }
 ];
-
-interface IAvg {
-    avgKills: number,
-    avgDeaths: number,
-    avgAssists: number,
-    avgCs: number,
-    avgKp: number,
-    avgDmgDealt: number,
-    avgDmgTaken: number,
-    avgGold: number,
-    wins: number,
-    noGames: number,
-
-    doubles: number,
-    triples: number,
-    quadras: number,
-    pentas: number,
-    firstBlood: number,
-    turrets: number,
-    inhibs: number
-}
-
-interface IChampionAvg extends IAvg {
-    champion: string
-}
 
 interface IPerson {
     [x: string]: any;
@@ -238,6 +213,8 @@ function Person(
 function PersonChampion(
     {championAvg: {
         champion,
+        banRate,
+
         avgKills, 
         avgDeaths, 
         avgAssists, 
@@ -274,7 +251,7 @@ function PersonChampion(
                 <CreepScore cs={avgCs} isMini={true}/>
             </div>
         </div>
-        <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
+        <AdditionalStats banRate={banRate} kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
         <Medals doubles={doubles} triples={triples} quadras={quadras} pentas={pentas} turrets={turrets} inhibs={inhibs} firstBloods={firstBlood}/>
     </div>
 }
