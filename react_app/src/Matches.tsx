@@ -237,7 +237,7 @@ function TeamPlayer({player: p, gameLength}: {player: ITeamPlayer, gameLength: n
             </div>
         </div>
         <div className="row centerCross">
-            <KDAStat k={p.kills} d={p.deaths} a={p.assists} isMini={true} isWhole={true}/>
+            <KDAStat k={p.kills} d={p.deaths} a={p.assists} kp={p.kp} isMini={true} isWhole={true}/>
             <CreepScore cs={p.cs} isMini={true} isWhole={true} gameLength={gameLength}/>
             <AdditionalStats kp={p.kp} dmgDealt={p.dmgDealt} dmgTaken={p.dmgTaken} gold={p.gold} isPerMin={false}/>
         </div>

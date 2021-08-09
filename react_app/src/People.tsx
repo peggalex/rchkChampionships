@@ -192,7 +192,7 @@ function Person(
             <div className="playerRightSide col">
                 <div className="mainStats row centerCross">
                     <WinRate wins={wins} games={noGames} isMini={false}/>
-                    <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} isMini={false}/>
+                    <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} kp={avgKp} isMini={false}/>
                     <CreepScore cs={avgCs} isMini={false}/>
                 </div>
                 <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
@@ -247,7 +247,7 @@ function PersonChampion(
         <div className="playerRightSide col">
             <div className="row centerCross">
                 <WinRate wins={wins} games={noGames} isMini={true}/>
-                <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} isMini={true}/>
+                <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} kp={avgKp} isMini={true}/>
                 <CreepScore cs={avgCs} isMini={true}/>
             </div>
         </div>

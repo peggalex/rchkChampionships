@@ -133,10 +133,10 @@ export function WinRate({wins, games, isMini}: {wins: number, games: number, isM
 }
 
 
-export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: number, a: number, isMini: boolean, isWhole?: boolean}){
+export function KDAStat({k, d, a, kp, isMini, isWhole = false}: {k: number, d: number, a: number, kp: number, isMini: boolean, isWhole?: boolean}){
     let totalKda = d == 0 ?  "∞ " : ((k + a)/d).toFixed(isMini ? 1 : 2);
     let formatKDA = (n: number) => n.toFixed(isWhole ? 0 : 1);
-    let isPink = d == 0 && 5 <= (k+a);
+    let isPink = d == 0 && 50 <= kp;
     let isGold = 10 <= (k+a)/d;
     let isBlue = 4 <= (k+a)/d;
 
@@ -382,7 +382,7 @@ function Player(
             <div className="playerRightSide col">
                 <div className="mainStats row centerCross">
                     <WinRate wins={wins} games={noGames} isMini={false}/>
-                    <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} isMini={false}/>
+                    <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} kp={avgKp} isMini={false}/>
                     <CreepScore cs={avgCs} isMini={false}/>
                 </div>
                 <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
@@ -441,7 +441,7 @@ function PlayerChampion(
         <div className="playerRightSide col">
             <div className="row centerCross">
                 <WinRate wins={wins} games={noGames} isMini={true}/>
-                <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} isMini={true}/>
+                <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} kp={avgKp} isMini={true}/>
                 <CreepScore cs={avgCs} isMini={true}/>
             </div>
         </div>
