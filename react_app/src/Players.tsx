@@ -136,9 +136,11 @@ export function WinRate({wins, games, isMini}: {wins: number, games: number, isM
 export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: number, a: number, isMini: boolean, isWhole?: boolean}){
     let totalKda = d == 0 ?  "∞ " : ((k + a)/d).toFixed(isMini ? 1 : 2);
     let formatKDA = (n: number) => n.toFixed(isWhole ? 0 : 1);
+    let isGold = d == 0 || 10 <= (k+a)/d;
+    let isBlue = 4 <= (k+a)/d;
 
     return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"}`}>
-        <span className={`totalKda mainStat ${d == 0 ? 'gold' : 4 <= (k+a)/d ? 'blue' : ''}`} title={`KDA ratio: ${totalKda}`}>
+        <span className={`totalKda mainStat ${isGold ? 'gold' : isBlue ? 'blue' : ''}`} title={`KDA ratio: ${totalKda}`}>
             {totalKda}
         </span>
         <div className="kda statBreakdown">
