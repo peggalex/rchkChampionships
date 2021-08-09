@@ -121,7 +121,7 @@ export function WinRate({wins, games, isMini}: {wins: number, games: number, isM
     let winRateDisplay = winRate.toFixed(0);
 
     return <div className={`winRateContainer statContainer ${isMini ? "mini" : "large"}`}>
-        <span className={`winRateTotal mainStat ${90 <= winRate ? 'gold' : 70 <= winRate ? 'blue' : ''}`} title={`Winrate: ${winRate}%`}>
+        <span className={`winRateTotal mainStat ${100 == winRate ? 'pink' : 90 <= winRate ? 'gold' : 70 <= winRate ? 'blue' : ''}`} title={`Winrate: ${winRate}%`}>
             {winRateDisplay}%
         </span>
         <div className="noGames statBreakdown">
@@ -136,11 +136,12 @@ export function WinRate({wins, games, isMini}: {wins: number, games: number, isM
 export function KDAStat({k, d, a, isMini, isWhole = false}: {k: number, d: number, a: number, isMini: boolean, isWhole?: boolean}){
     let totalKda = d == 0 ?  "∞ " : ((k + a)/d).toFixed(isMini ? 1 : 2);
     let formatKDA = (n: number) => n.toFixed(isWhole ? 0 : 1);
-    let isGold = d == 0 || 10 <= (k+a)/d;
+    let isPink = d == 0 && 4 <= (k+a);
+    let isGold = 10 <= (k+a)/d;
     let isBlue = 4 <= (k+a)/d;
 
     return <div className={`kdaContainer statContainer ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"}`}>
-        <span className={`totalKda mainStat ${isGold ? 'gold' : isBlue ? 'blue' : ''}`} title={`KDA ratio: ${totalKda}`}>
+        <span className={`totalKda mainStat ${isPink ? 'pink' : isGold ? 'gold' : isBlue ? 'blue' : ''}`} title={`KDA ratio: ${totalKda}`}>
             {totalKda}
         </span>
         <div className="kda statBreakdown">
@@ -156,8 +157,9 @@ export function CreepScore({cs, isMini, isWhole = false, gameLength}: {cs: numbe
     let csMin = isWhole ? 60 / (gameLength ?? -1) * cs : cs;
     let isBlue = 7.5 <= csMin && csMin < 9;
     let isGold = 9 <= csMin;
+    let isPink = 10 <= csMin;
     return <span 
-        className={`csMin mainStat ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"} ${isGold ? 'gold' : isBlue ? 'blue' : ''}`} 
+        className={`csMin mainStat ${isMini ? "mini" : "large"} ${isWhole ? "whole" : "decimal"} ${isPink ? 'pink' : isGold ? 'gold' : isBlue ? 'blue' : ''}`} 
         title={isWhole ? `Creep Score: ${formatCs} (${csMin.toFixed(1)}/m)` : `Creep Score / min: ${formatCs}`}
     >
         {formatCs}
@@ -187,8 +189,9 @@ export function AdditionalStats({
             icon: Icons.KillParticipationIcon,
             value: `${Math.round(kp)}%`,
             label: "Kill Participation",
-            isGold: 95 <= Math.round(kp),
-            isBlue: 70 <= Math.round(kp) && Math.round(kp) < 95
+            isPink: 100 == kp,
+            isGold: 90 <= Math.round(kp),
+            isBlue: 70 <= Math.round(kp) && Math.round(kp) < 90
         },
         {
             icon: Icons.DmgDealtIcon,
@@ -212,14 +215,15 @@ export function AdditionalStats({
             icon: Icons.BanRate,
             value: `${Math.round(banRate*100)}%`,
             label: "Ban Rate (enemy team)",
+            isPink: 75 <= Math.round(banRate*100),
             isGold: 50 <= Math.round(banRate*100),
-            isBlue: 25 <= Math.round(banRate*100) && Math.round(banRate*100) < 50
+            isBlue: 25 <= Math.round(banRate*100)
         }, ...data];
     }
 
     return <div className="additionalStats row centerCross spaceAround">
         {data.map((d, i) => <div 
-            className={`row centerAll ${(d.isGold ?? false) ? 'gold' : (d.isBlue ?? false) ? 'blue' : ''}`} 
+            className={`row centerAll ${(d.isPink ?? false) ? 'pink' : (d.isGold ?? false) ? 'gold' : (d.isBlue ?? false) ? 'blue' : ''}`} 
             title={`${d.label}: ${d.value}`} 
             key={i}
         >

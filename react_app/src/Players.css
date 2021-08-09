@@ -245,6 +245,14 @@
     color: var(--teal600);
 }
 
+.mainStat.pink {
+    color: var(--pink500);
+}
+
+.mainStat.pink:after {
+    color: var(--pink600);
+}
+
 .csMin.mini {
     width: 5rem;
 }
@@ -341,6 +349,10 @@
     color: var(--teal600);
 }
 
+.additionalStats .pink {
+    color: var(--pink600);
+}
+
 .additionalStats .gold {
     color: var(--yellow600);
 }
@@ -373,6 +385,10 @@
 
 .blue > .additionalStatIcon > svg{
     color: var(--teal500);
+}
+
+.pink > .additionalStatIcon > svg{
+    color: var(--pink500);
 }
 /*
 .champion:not(:hover) .additionalStats {
