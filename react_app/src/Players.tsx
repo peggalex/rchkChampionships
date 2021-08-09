@@ -136,7 +136,7 @@ export function WinRate({wins, games, isMini}: {wins: number, games: number, isM
 export function KDAStat({k, d, a, kp, isMini, isWhole = false}: {k: number, d: number, a: number, kp: number, isMini: boolean, isWhole?: boolean}){
     let totalKda = d == 0 ?  "∞ " : ((k + a)/d).toFixed(isMini ? 1 : 2);
     let formatKDA = (n: number) => n.toFixed(isWhole ? 0 : 1);
-    let isPink = d == 0 && 50 <= kp;
+    let isPink = (d == 0 && 50 <= kp) || 20 <= (k+a)/d;
     let isGold = 10 <= (k+a)/d;
     let isBlue = 4 <= (k+a)/d;
 
