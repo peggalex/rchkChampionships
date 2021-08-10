@@ -119,9 +119,12 @@ export function WinRate({wins, games, isMini}: {wins: number, games: number, isM
     let losses = games - wins;
     let winRate = Math.round(100*wins/games);
     let winRateDisplay = winRate.toFixed(0);
+    let isPink = 100 == winRate && 3 <= wins;
+    let isGold =  90 <= winRate && 2 <= wins;
+    let isBlue = 70 <= winRate;
 
     return <div className={`winRateContainer statContainer ${isMini ? "mini" : "large"}`}>
-        <span className={`winRateTotal mainStat ${100 == winRate && 3 <= wins ? 'pink' : 90 <= winRate ? 'gold' : 70 <= winRate ? 'blue' : ''}`} title={`Winrate: ${winRate}%`}>
+        <span className={`winRateTotal mainStat ${isPink ? 'pink' : isGold ? 'gold' : isBlue ? 'blue' : ''}`} title={`Winrate: ${winRate}%`}>
             {winRateDisplay}%
         </span>
         <div className="noGames statBreakdown">
