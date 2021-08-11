@@ -83,7 +83,7 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
 interface IPerson {
     [x: string]: any;
     allAvgs: IAvg,
-    person: string,
+    personName: string,
     iconId: number,
     accounts: {[accountId: number]: string},
     championAvgs: IChampionAvg[]
@@ -334,7 +334,7 @@ function People(): JSX.Element {
         <div>
             {PLAYERS_ARE_LOADED ?
                 people
-                    .filter(p => p.summonerName.toLowerCase().startsWith(search?.toLowerCase()))
+                    .filter(p => p.personName.toLowerCase().startsWith(search?.toLowerCase()))
                     .map((p, i) => <Person person={p} key={i}/>) :
                 <div className="loaderContainer"><div className="loader"></div></div>
             }
