@@ -32,7 +32,7 @@ def getChampionStats(cursor: SqliteDB):
                 JOIN {PLAYER_TABLE.name} p ON tp.{PLAYER_ACCOUNTID_COL.name} = p.{PLAYER_ACCOUNTID_COL.name}
                 JOIN {MATCH_TABLE.name} m ON tp.{MATCH_MATCHID_COL.name} = m.{MATCH_MATCHID_COL.name}
         WHERE p.{PERSON_NAME_COL.name} IS NOT NULL
-        GROUP BY p.{PERSON_NAME_COL.name}, {TEAMPLAYER_CHAMPION_COL.name}
+        GROUP BY {TEAMPLAYER_CHAMPION_COL.name}, p.{PERSON_NAME_COL.name}
         ORDER BY 
             {TEAMPLAYER_CHAMPION_COL.name},
             COUNT(*) DESC, 
@@ -85,7 +85,7 @@ def getChampionStats(cursor: SqliteDB):
             "personAvgs": personAvgs
         })
 
-        while i < len(avgChampStats):
+        while i < len(avgPersonChampStats):
             personStat = avgPersonChampStats[i] 
             if personStat[TEAMPLAYER_CHAMPION_COL.name] == champion:
                 # get rid of fields stored in parent
@@ -115,5 +115,5 @@ def getChampionStats(cursor: SqliteDB):
             else:
                 break
 
-    assert i == len(avgChampStats)
+    assert i == len(avgPersonChampStats)
     return stats

@@ -26,6 +26,11 @@ const ChampionSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
         sort: NumericCompareFunc((c: IChampion) => c.allAvgs.noGames),
         desc: true
     },
+    {
+        name: 'banrate',
+        sort: NumericCompareFunc((c: IChampion) => c.allAvgs.banRate),
+        desc: true
+    },
     winRateSort,
     {
         name: "wins",
