@@ -1,72 +1,72 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect, useHistory, useParams } from 'react-router-dom';
 import { GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI, NumericCompareFunc, CompareNumbers, CompareType, CompareFunc, GetProfileIconUrl } from './Utilities';
-import "./People.css";
+import "./Champions.css";
 import Icons from './Icons';
 import Medals from './Medals';
 import { AdditionalStats, CreepScore, IAvg, IChampionAvg, KDAStat, WinRate } from './Players';
 
 const winRateSort = {
     name: 'winrate', 
-    sort: NumericCompareFunc((p: IPerson) =>  p.allAvgs.wins / p.allAvgs.noGames),
+    sort: NumericCompareFunc((c: IChampion) =>  c.allAvgs.wins / c.allAvgs.noGames),
     desc: true
 };
 
 const kdaSort = {
     name: 'kda', 
-    sort: NumericCompareFunc((p: IPerson) => 
-        (p.allAvgs.avgKills + p.allAvgs.avgAssists) / p.allAvgs.avgDeaths
+    sort: NumericCompareFunc((c: IChampion) => 
+        (c.allAvgs.avgKills + c.allAvgs.avgAssists) / c.allAvgs.avgDeaths
     ),
     desc: true
 };
 
-const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
+const ChampionSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
+    {
+        name: 'games played',
+        sort: NumericCompareFunc((c: IChampion) => c.allAvgs.noGames),
+        desc: true
+    },
     winRateSort,
     {
         name: "wins",
-        sort: NumericCompareFunc((p: IPerson) =>  p.allAvgs.wins),
+        sort: NumericCompareFunc((c: IChampion) =>  c.allAvgs.wins),
         desc: true
     },
     kdaSort,
     {
         name: "cs",
-        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.avgCs),
+        sort: NumericCompareFunc((c: IChampion) => c.allAvgs.avgCs),
         desc: true
     },
     {
         name: "kp",
-        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.avgKp),
+        sort: NumericCompareFunc((c: IChampion) => c.allAvgs.avgKp),
         desc: true
     },
     {
         name: "dmg dealt",
-        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.avgDmgDealt),
+        sort: NumericCompareFunc((c: IChampion) => c.allAvgs.avgDmgDealt),
         desc: true
     },
     {
         name: "dmg taken",
-        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.avgDmgTaken),
+        sort: NumericCompareFunc((c: IChampion) => c.allAvgs.avgDmgTaken),
         desc: true
     },
     {
         name: 'gold', 
-        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.avgGold),
+        sort: NumericCompareFunc((c: IChampion) => c.allAvgs.avgGold),
         desc: true
     },
     {
-        name: 'champs played',
-        sort: NumericCompareFunc((p: IPerson) => p.championAvgs.length),
+        name: 'players',
+        sort: NumericCompareFunc((c: IChampion) => c.personAvgs.length),
         desc: true
     },
     {
-        name: 'games played',
-        sort: NumericCompareFunc((p: IPerson) => p.allAvgs.noGames),
-        desc: true
-    },
-    {
-        name: 'name',
-        sort: (a: IPerson, b: IPerson) => {
-            let [aName, bName] = [a.personName, b.personName];
+        name: 'name', 
+        sort: (a: IChampion, b: IChampion) => {
+            let [aName, bName] = [a.champion, b.champion];
 
             let shorterNameLen = Math.min(aName.length, bName.length);
             for (let i = 0; i < shorterNameLen; i++){
@@ -75,75 +75,33 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
                 if (comparison != CompareType.same) return comparison;
             }
             return NumericCompareFunc((x: string) => x.length)(aName, bName);
-        },
+        }, 
         desc: false
     }
 ];
 
-interface IPerson {
-    allAvgs: IAvg,
-    personName: string,
-    iconId: number,
-    accounts: {[accountId: number]: string},
-    championAvgs: IChampionAvg[]
+export interface IPersonChampionAvg extends IChampionAvg {
+    personName: string|null,
+    iconId: number
 }
 
-
-async function getAvgColorStr(src: string){
-    let rgb = await get_average_rgb(src);
-    return `rgb(${rgb.join(',')})`;
+interface IChampion {
+    champion: string,
+    allAvgs: IChampionAvg,
+    personAvgs: IPersonChampionAvg[]
 }
 
-async function get_average_rgb(src: string): Promise<Uint8ClampedArray> {
-    /* https://stackoverflow.com/questions/2541481/get-average-color-of-image-via-javascript */
-    return new Promise(resolve => {
-        let context = document.createElement('canvas').getContext('2d');
-        context!.imageSmoothingEnabled = true;
-
-        let img = new Image;
-        img.src = src;
-        img.crossOrigin = "";
-
-        img.onload = () => {
-            context!.drawImage(img, 0, 0, 1, 1);
-            resolve(context!.getImageData(0, 0, 1, 1).data.slice(0,3));
-        };
-    });
-}
-
-function PersonIcon({iconId}: {iconId: number}){
-    let [personColorStr, setPersonColorStr] = React.useState("var(--grey800)");
-    React.useEffect(() => {
-        getAvgColorStr(GetProfileIconUrl(iconId)).then(
-            (color) => setPersonColorStr(color)
-        );
-    }, []);
-    return <div 
-        className="personPic centerAll profilePic circle" 
-        style={{backgroundColor: personColorStr}}
-    >
-        {Icons.User}
-    </div>
-}
-
-function Names({personName, accounts}: {personName: string, accounts: {[accountId: number]: string}}){
-    const history = useHistory();
-
+function Names({championName}: {championName: string, }){
     return <div className="summonerNameContainer">
-        <h2>{personName}</h2>
-        <div className="underSummonerName personAccountLink row">{
-            Object.entries(accounts).map(([accId, name], i) => 
-                <p onClick={()=>history.push(`/players/${accId}`)} className="clickable blueTextHover">{name}</p>            
-            )
-        }</div>
+        <h2>{GetChampDisplayName(championName)}</h2>
     </div>
 }
 
-function Person(
-    {person: {
-        iconId, 
-        personName,
+function Champion(
+    {champion: {
+        champion,
         allAvgs: {
+            banRate,
             avgKills, 
             avgDeaths, 
             avgAssists, 
@@ -155,14 +113,12 @@ function Person(
             wins,
             noGames
         }, 
-        accounts,
-        championAvgs
-    }}:
-    {person: IPerson}
+        personAvgs
+    }}: {champion: IChampion}
 ): JSX.Element {
 
-    let { selectedPersonName } = useParams() as { selectedPersonName?: string };
-    let isSelected = personName === selectedPersonName; // use params will return a string
+    let { championSelected } = useParams() as { championSelected?: string };
+    let isSelected = champion == championSelected; // use params will return a string
 
     const elRef = React.useRef(null as HTMLDivElement|null);
 
@@ -174,7 +130,6 @@ function Person(
         }
     }, []);
 
-
     return <div ref={elRef}>
         <div 
             className={`player whiteWhenHovered row centerCross clickable ${isExpanded ? "expanded" : ""}`} 
@@ -183,20 +138,20 @@ function Person(
             <div className="collapseIcon">
                 {isExpanded ? Icons.ChevronUp : Icons.ChevronDown}
             </div>
-            <PersonIcon iconId={iconId}/>
-            <Names personName={personName} accounts={accounts}/>
+            <img className="profilePic circle" src={GetChampIconUrl(champion)}/>
+            <Names championName={champion} />
             <div className="playerRightSide col">
                 <div className="mainStats row centerCross">
                     <WinRate wins={wins} games={noGames} isMini={false}/>
                     <KDAStat k={avgKills} d={avgDeaths} a={avgAssists} kp={avgKp} isMini={false}/>
                     <CreepScore cs={avgCs} isMini={false}/>
                 </div>
-                <AdditionalStats kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
+                <AdditionalStats banRate={banRate} kp={avgKp} dmgDealt={avgDmgDealt} dmgTaken={avgDmgTaken} gold={avgGold} isPerMin={true}/>
             </div>
         </div>
         {isExpanded ? <div className="championAvgsContainer accordionShadow">
-                {championAvgs.map((c, i) => <PersonChampion 
-                    championAvg={c} 
+                {personAvgs.map((p, i) => <PersonChampion 
+                    personAvg={p} 
                     key={i}
                 />)}
             </div> : null
@@ -206,8 +161,9 @@ function Person(
 
 
 function PersonChampion(
-    {championAvg: {
-        champion,
+    {personAvg: {
+        personName,
+        iconId,
         banRate,
 
         avgKills, 
@@ -229,15 +185,19 @@ function PersonChampion(
         turrets,
         inhibs
     }}:
-    {championAvg: IChampionAvg}
+    {personAvg: IPersonChampionAvg}
 ): JSX.Element {
 
     // champion is in pascal case
+    const history = useHistory();
 
-    return <div className="champion row centerCross">
+    return <div className="champion personChampion row centerCross">
         <div className="playerLeftSide row centerCross">
-        <img className="championIcon circle" src={GetChampIconUrl(champion)}/>
-            <h2 className="champName">{GetChampDisplayName(champion)}</h2>
+            <img className="championIcon circle" src={GetProfileIconUrl(iconId)}/>
+            <h2 
+                onClick={() => history.push(`/people/${personName}`)} 
+                className="champName clickable blueTextHover"
+            >{personName}</h2>
         </div>
         <div className="playerRightSide col">
             <div className="row centerCross">
@@ -251,37 +211,38 @@ function PersonChampion(
     </div>
 }
 
-var PLAYERS_ARE_LOADED = false;
-var PLAYERS: IPerson[] = [];
+var CHAMPIONS_ARE_LOADED = false;
+var CHAMPIONS: IChampion[] = [];
 
-function People(): JSX.Element {
+function Champions(): JSX.Element {
 
     const [search, setSearch] = React.useState("");
 
-    const [sort, setSort] = React.useState(PlayerSort[0]);
+    const [sort, setSort] = React.useState(ChampionSort[0]);
     const [showFilterSelection, setShowFilterSelection] = React.useState(false);
 
-    const [people, setPeople] = React.useState([] as IPerson[]);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [champions, setChampions] = React.useState([] as IChampion[]);
 
-    function setPlayersSorted(oldPeople: IPerson[]){
-        let newPeople = [...oldPeople].sort((a,b) => 
+    function setChampionsSorted(oldChampions: IChampion[]){
+        let newChampions = [...oldChampions].sort((a,b) => 
             sort.sort(a,b) || winRateSort.sort(a,b) || kdaSort.sort(a,b)
         );
-        if (sort.desc) newPeople.reverse();
-        setPeople(newPeople);
+        if (sort.desc) newChampions.reverse();
+        setChampions(newChampions);
     }
 
     async function getPlayers(){
-        if (!PLAYERS_ARE_LOADED){
-            let res = await CallAPI("/getPersonStats", RestfulType.GET);
-            PLAYERS = res["res"];
-            PLAYERS_ARE_LOADED = true;
+        if (!CHAMPIONS_ARE_LOADED){
+            let res = await CallAPI("/getChampionStats", RestfulType.GET);
+            CHAMPIONS = res["res"];
         }
-        setPlayersSorted(PLAYERS);
+        setIsLoading(false);
+        setChampionsSorted(CHAMPIONS);
     }
 
     React.useEffect(() => {
-        setPlayersSorted(people);
+        setChampionsSorted(CHAMPIONS);
     }, [sort]);
 
     React.useEffect(() => {
@@ -302,7 +263,7 @@ function People(): JSX.Element {
                 </div>
                 {showFilterSelection ? 
                     <div className="playerSortSelection col">
-                        {PlayerSort.map((s, i) => 
+                        {ChampionSort.map((s, i) => 
                             <div 
                                 className={`sortOption clickable row centerCross ${s.name == sort.name ? "selected" : "notSelected"}`}
                                 onClick={() => {
@@ -327,14 +288,14 @@ function People(): JSX.Element {
             </div>
         </div>
         <div>
-            {PLAYERS_ARE_LOADED ?
-                people
-                    .filter(p => p.personName.toLowerCase().startsWith(search?.toLowerCase()))
-                    .map((p, i) => <Person person={p} key={i}/>) :
+            {!isLoading ?
+                champions
+                    .filter(c => GetChampDisplayName(c.champion).toLowerCase().startsWith(search?.toLowerCase()))
+                    .map((c, i) => <Champion champion={c} key={i}/>) :
                 <div className="loaderContainer"><div className="loader"></div></div>
             }
         </div>
     </div>;
 }
 
-export default People;
+export default Champions;

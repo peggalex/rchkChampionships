@@ -1,0 +1,3 @@
+.personChampion.champion .additionalStats {
+    width: calc(26.5rem); /* champions also have bans */
+}

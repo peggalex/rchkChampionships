@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect, useHistory, useParams } from 'react-router-dom';
-import { GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI, NumericCompareFunc, CompareNumbers, CompareType, CompareFunc, GetPlayerElementId, GetProfileIconUrl } from './Utilities';
+import { GetChampDisplayName, GetChampIconUrl, RestfulType, CallAPI, NumericCompareFunc, CompareNumbers, CompareType, CompareFunc, GetProfileIconUrl } from './Utilities';
 import "./Players.css";
 import Icons from './Icons';
 import Medals from './Medals';
@@ -106,7 +106,6 @@ export interface IChampionAvg extends IAvg {
 }
 
 interface IPlayer {
-    [x: string]: any;
     summonerName: string,
     accountId: number,
     iconId: number,
@@ -357,8 +356,6 @@ function Player(
 
     const elRef = React.useRef(null as HTMLDivElement|null);
 
-    let playerElementId = GetPlayerElementId(accountId);
-
     const [isExpanded, setIsExpanded] = React.useState(isSelected);
 
     React.useEffect(() => {
@@ -367,7 +364,7 @@ function Player(
         }
     }, []);
 
-    return <div id={playerElementId} ref={elRef}>
+    return <div ref={elRef}>
         <div 
             className={`player whiteWhenHovered row centerCross clickable ${isExpanded ? "expanded" : ""}`} 
             onClick={() => setIsExpanded(!isExpanded)}

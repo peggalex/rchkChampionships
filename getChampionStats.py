@@ -61,7 +61,7 @@ def getChampionStats(cursor: SqliteDB):
 
     for avgChampStat in avgChampStats:
         champion = avgChampStat[TEAMPLAYER_CHAMPION_COL.name]
-        playerAvgs = []
+        personAvgs = []
 
         banRateName = "banRate"
         noBansQuery = f"SUM(CASE WHEN '{champion}' IN ({','.join((c.name for c in TEAM_BAN_COLS))}) THEN 1 ELSE 0 END)"
@@ -82,7 +82,7 @@ def getChampionStats(cursor: SqliteDB):
         stats.append({
             "champion": champion,
             "allAvgs": avgChampStat, 
-            "playerAvgs": playerAvgs
+            "personAvgs": personAvgs
         })
 
         while i < len(avgChampStats):
@@ -110,7 +110,7 @@ def getChampionStats(cursor: SqliteDB):
 
                 personStat[banRateName] = banRate
 
-                playerAvgs.append(personStat)
+                personAvgs.append(personStat)
                 i+=1
             else:
                 break

@@ -84,7 +84,6 @@ export const CallAPIJson = async (
     }
 );
 
-export const GetPlayerElementId = (accountId: number): string => `player${accountId}`;
 export const GetProfileIconUrl = (iconId: number): string => `http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/${iconId}.png`;
 
 export const GetChampIconUrl = (champ: string): string => `http://ddragon.leagueoflegends.com/cdn/11.11.1/img/champion/${champ}.png`;

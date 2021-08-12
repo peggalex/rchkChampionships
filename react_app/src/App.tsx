@@ -8,6 +8,7 @@ import Players from './Players';
 import Matches from './Matches';
 import AddMatch from './AddMatch';
 import People from './People';
+import Champions from './Champions';
 
 const MainTab = ({ tab }: { tab: ITab }) =>
 	<div className='mainTab whiteWhenHovered'>
@@ -26,6 +27,12 @@ const tabs: ITab[] = [
 		route: "/players", 
 		component: Players,
 		otherPaths: ['/players/:accId?']
+	},
+	{ 
+		label: "champions", 
+		route: "/champions", 
+		component: Champions,
+		otherPaths: ['/champions/:championSelected?']
 	},
 	{ 
 		label: "matches", 
