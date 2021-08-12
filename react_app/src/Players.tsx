@@ -19,6 +19,13 @@ const kdaSort = {
     desc: true
 };
 
+const gamesPlayedSort =  {
+    name: 'games played',
+    sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.noGames),
+    desc: true
+}
+
+
 const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
     winRateSort,
     {
@@ -57,11 +64,7 @@ const PlayerSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
         sort: NumericCompareFunc((p: IPlayer) => p.championAvgs.length),
         desc: true
     },
-    {
-        name: 'games played',
-        sort: NumericCompareFunc((p: IPlayer) => p.allAvgs.noGames),
-        desc: true
-    },
+    gamesPlayedSort,
     {
         name: 'name', 
         sort: (a: IPlayer, b: IPlayer) => {
@@ -465,7 +468,7 @@ function Players(): JSX.Element {
 
     function setPlayersSorted(oldPlayers: IPlayer[]){
         let newPlayers = [...oldPlayers].sort((a,b) => 
-            sort.sort(a,b) || winRateSort.sort(a,b) || kdaSort.sort(a,b)
+            sort.sort(a,b) || winRateSort.sort(a,b) || gamesPlayedSort.sort(a,b) || kdaSort.sort(a,b)
         );
         if (sort.desc) newPlayers.reverse();
         setPlayers(newPlayers);

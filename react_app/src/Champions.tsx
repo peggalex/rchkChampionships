@@ -20,18 +20,20 @@ const kdaSort = {
     desc: true
 };
 
+const gamesPlayedSort = {
+    name: 'games played',
+    sort: NumericCompareFunc((c: IChampion) => c.allAvgs.noGames),
+    desc: true
+}
+
 const ChampionSort: {name: string, sort: CompareFunc, desc: boolean}[] = [
-    {
-        name: 'games played',
-        sort: NumericCompareFunc((c: IChampion) => c.allAvgs.noGames),
-        desc: true
-    },
+    winRateSort,
     {
         name: 'banrate',
         sort: NumericCompareFunc((c: IChampion) => c.allAvgs.banRate),
         desc: true
     },
-    winRateSort,
+    gamesPlayedSort,
     {
         name: "wins",
         sort: NumericCompareFunc((c: IChampion) =>  c.allAvgs.wins),
@@ -231,7 +233,7 @@ function Champions(): JSX.Element {
 
     function setChampionsSorted(oldChampions: IChampion[]){
         let newChampions = [...oldChampions].sort((a,b) => 
-            sort.sort(a,b) || winRateSort.sort(a,b) || kdaSort.sort(a,b)
+            sort.sort(a,b) || winRateSort.sort(a,b) || gamesPlayedSort.sort(a,b) || kdaSort.sort(a,b)
         );
         if (sort.desc) newChampions.reverse();
         setChampions(newChampions);
