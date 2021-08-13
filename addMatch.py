@@ -1,10 +1,7 @@
+from makeRequest import makeRequest
 from bs4 import BeautifulSoup
 from datetime import timedelta
 import time
-import requests
-import re
-import json
-import quopri
 from Schema import *
 from SqliteLib import *
 from serverUtilities import assertGoodRequest 
@@ -16,76 +13,54 @@ URL_ENCODED_BACKSLASH = '%2F'
 DEFAULT_ICON = 29
 BLUE_SIDE, RED_SIDE = 100, 200 # "100 for blue side. 200 for red side." (developer.riotgames.com/apis#match-v4)
 
-def makeRequest(query: str, level = 0):
-    if 6 < level:
-        raise Exception("too many timeouts")
-
-    res = requests.get(query)
-    if res.status_code != 200:
-
-        if res.status_code == 429:
-            retryAfter = int(res.headers['Retry-After'])
-            print(f"retry after {retryAfter} secs")
-            time.sleep(retryAfter)
-            return makeRequest(query, level + 1)
-
-        elif res.status_code == 404:
-            raise Exception("404: url not found")
-
-        else:
-            print(f"received error code ({res.status_code}): {level}")
-            time.sleep(1)
-            return makeRequest(query, level + 1)
-    return res.json()
-
 CHAMPS_ID_TO_NAME = {}
-CHAMPS_JSON_URL = "http://ddragon.leagueoflegends.com/cdn/11.16.1/data/en_US/champion.json"
+CHAMPS_JSON_URL = lambda leagueVersion: f"http://ddragon.leagueoflegends.com/cdn/{leagueVersion}/data/en_US/champion.json"
 
-def UpdateChampsIdToName():
+def UpdateChampsIdToName(leagueVersion: str):
     global CHAMPS_ID_TO_NAME
 
-    champsJson = makeRequest(CHAMPS_JSON_URL)["data"]
+    champsJson = makeRequest(CHAMPS_JSON_URL(leagueVersion))["data"]
     CHAMPS_ID_TO_NAME = {int(v["key"]): k for k,v in champsJson.items()}
     
-def GetChamp(id: int) -> str:
+def GetChamp(id: int, GetUpdateLeagueVersion: '(bool?) -> str') -> str:
     if id not in CHAMPS_ID_TO_NAME:
-        UpdateChampsIdToName()
+        UpdateChampsIdToName(GetUpdateLeagueVersion(force=True))
         if id not in CHAMPS_ID_TO_NAME:
             raise Exception(f"champion id: '{id}' invalid.")
     return CHAMPS_ID_TO_NAME[id]
 
 SUMMONERS_ID_TO_NAME = {}
-SUMONERS_JSON_URL = "http://ddragon.leagueoflegends.com/cdn/11.12.1/data/en_US/summoner.json"
+SUMONERS_JSON_URL = lambda leagueVersion: f"http://ddragon.leagueoflegends.com/cdn/{leagueVersion}/data/en_US/summoner.json"
 
-def UpdateSummonersIdToName():
+def UpdateSummonersIdToName(leagueVersion):
     global SUMMONERS_ID_TO_NAME
     
-    summonersJson = makeRequest(SUMONERS_JSON_URL)["data"]
+    summonersJson = makeRequest(SUMONERS_JSON_URL(leagueVersion))["data"]
     SUMMONERS_ID_TO_NAME = {int(v["key"]): k for k,v in summonersJson.items()}
 
-def GetSummoner(id: int) -> str:
+def GetSummoner(id: int, GetUpdateLeagueVersion: '(bool?) -> str') -> str:
     if id not in SUMMONERS_ID_TO_NAME:
-        UpdateSummonersIdToName()
+        UpdateSummonersIdToName(GetUpdateLeagueVersion(force=True))
         if id not in SUMMONERS_ID_TO_NAME:
             raise Exception(f"summoner id: '{id}' invalid.")
     return SUMMONERS_ID_TO_NAME[id]
 
 
 KEYSTONE_ID_TO_URL = {}
-PERK_LIST_URL = "http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/runesReforged.json"
+PERK_LIST_URL = lambda leagueVersion: f"http://ddragon.leagueoflegends.com/cdn/{leagueVersion}/data/en_US/runesReforged.json"
 # thank you so much to stackoverflow question 64043232
 
-def UpdateKeystoneIdToName():
+def UpdateKeystoneIdToName(leagueVersion: str):
     global KEYSTONE_ID_TO_URL
     
-    perks = makeRequest(PERK_LIST_URL)
+    perks = makeRequest(PERK_LIST_URL(leagueVersion))
     for p in perks:
         for keystone in p['slots'][0]['runes']:
             KEYSTONE_ID_TO_URL[keystone['id']] = keystone['icon']
 
-def GetKeystone(id: int) -> str:
+def GetKeystone(id: int, GetUpdateLeagueVersion: '(bool?) -> str') -> str:
     if id not in KEYSTONE_ID_TO_URL:
-        UpdateKeystoneIdToName()
+        UpdateKeystoneIdToName(GetUpdateLeagueVersion(force=True))
         if id not in KEYSTONE_ID_TO_URL:
             raise Exception(f"keystone id: '{id}' invalid.")
     return KEYSTONE_ID_TO_URL[id]
@@ -145,7 +120,7 @@ def addTeam(cursor, riotData):
             bans=bans
         )
 
-def addPlayers(cursor, riotData, championToAccIdAndName):
+def addPlayers(cursor, riotData, championToAccIdAndName, GetUpdateLeagueVersion: '(bool?) -> str'):
     matchId = riotData['gameId']
     date = riotData['gameDuration']
     region = riotData['platformId']
@@ -158,7 +133,7 @@ def addPlayers(cursor, riotData, championToAccIdAndName):
         teamIdToKills[teamId] = cummKills + kills
 
     for participant in riotData['participants']:
-        champion = GetChamp(participant["championId"])
+        champion = GetChamp(participant["championId"], GetUpdateLeagueVersion)
         accountId = championToAccIdAndName[champion][PLAYER_ACCOUNTID_COL.name]
         name = championToAccIdAndName[champion][PLAYER_SUMMONERNAME_COL.name]
         isRedSide = participant["teamId"] == RED_SIDE
@@ -194,15 +169,15 @@ def addPlayers(cursor, riotData, championToAccIdAndName):
             quadras=stats["quadraKills"],
             pentas=stats["pentaKills"],
 
-            spell1=GetSummoner(participant["spell1Id"]),
-            spell2=GetSummoner(participant["spell2Id"]),
+            spell1=GetSummoner(participant["spell1Id"], GetUpdateLeagueVersion),
+            spell2=GetSummoner(participant["spell2Id"], GetUpdateLeagueVersion),
 
             kp=kp,
             dmgDealt=stats["totalDamageDealtToChampions"],
             dmgTaken=stats["totalDamageTaken"],
             gold=stats["goldEarned"],
 
-            keyStoneUrl=GetKeystone(stats["perk0"]),
+            keyStoneUrl=GetKeystone(stats["perk0"], GetUpdateLeagueVersion),
 
             healing=stats["totalHeal"],
             vision=stats["visionScore"],
@@ -214,7 +189,7 @@ def addPlayers(cursor, riotData, championToAccIdAndName):
             items=[stats[f"item{i}"] for i in range(7)]
         )
 
-def addMatch(cursor, html):
+def addMatch(cursor, html, GetUpdateLeagueVersion: '(bool?) -> str'):
 
     try:
         soup = BeautifulSoup(html, 'html.parser')
@@ -276,7 +251,7 @@ def addMatch(cursor, html):
     redTeam = [t for t in riotRes["teams"] if t["teamId"] == RED_SIDE][0]
     redSideWon = redTeam["win"] == "Win"
 
-    addPlayers(cursor, riotRes, getChampionToAccIdAndName(soup))
+    addPlayers(cursor, riotRes, getChampionToAccIdAndName(soup), GetUpdateLeagueVersion)
     addTeam(cursor, riotRes)
 
     AddMatch(cursor, matchId, redSideWon, gameLength, date)
