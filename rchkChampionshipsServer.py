@@ -1,5 +1,7 @@
+from makeRequest import makeRequest
 import traceback
 import logging as notFlaskLogging
+from datetime import datetime, timedelta
 from flask import *
 from addMatch import addMatch
 from getMatch import getMatches
@@ -17,6 +19,10 @@ from sqlite3 import OperationalError as sqlite3Error
 
 notFlaskLogging.basicConfig(level=notFlaskLogging.DEBUG)
 app = Flask(__name__, static_folder='./react_app/build/static', template_folder="./react_app/build")
+
+LEAGUE_VERSION = None
+LAST_UPDATED_LEAGUE_VERSION = None
+i = 0
 
 def handleException(cursor, e):
     lastQuery = cursor.lastQuery # save before rollback
@@ -44,7 +50,7 @@ def addMatchTextEndpoint():
                 "Expecting html field in post data."
             )
 
-            date = addMatch(cursor, data['html'])
+            date = addMatch(cursor, data['html'], GetUpdateLeagueVersion)
             return {"date": date}, 200
 
         except Exception as e:
@@ -89,7 +95,7 @@ def addMatchHTMLEndpoint():
             else:
                 html = file.read().decode("latin")
                 
-            date = addMatch(cursor, html)
+            date = addMatch(cursor, html, GetUpdateLeagueVersion)
             return {"date": date}, 200
 
         except Exception as e:
@@ -154,10 +160,31 @@ def getImagesEndpoint(filename):
         filename
     )
 
+@app.route('/getLeagueVersion', methods=['GET'])
+def getLeagueVersion():
+    return {"res": GetUpdateLeagueVersion(force = False)}, 200
+
 @app.route('/')
 @app.errorhandler(404)   
 def index(e = None):
     return render_template('index.html')
+
+VERSION_ARRAY_URL = "https://ddragon.leagueoflegends.com/api/versions.json"
+
+def GetUpdateLeagueVersion(force: bool = False):
+    global LEAGUE_VERSION, LAST_UPDATED_LEAGUE_VERSION, i
+
+    now = datetime.now()
+    isOld = (now - (LAST_UPDATED_LEAGUE_VERSION or now)) < timedelta(days=1)
+    if (LEAGUE_VERSION == None or force or isOld):
+
+        LEAGUE_VERSION = makeRequest(VERSION_ARRAY_URL)[0]
+        LAST_UPDATED_LEAGUE_VERSION = now
+        i += 1
+        print('iter', i)
+
+    print('version:', LEAGUE_VERSION)
+    return LEAGUE_VERSION
 
 if __name__=="__main__":
     print('starting server...')

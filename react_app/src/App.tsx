@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
-import { ITab, Tab } from './Utilities';
+import { ITab, Tab, updateLeagueVersion } from './Utilities';
 import './App.css';
 import './tailwindColours.css';
 import './Icons.css';
@@ -51,15 +51,21 @@ const tabs: ITab[] = [
 const disclaimer = "RCHK Championships was created under Riot Games' \"Legal Jibber Jabber\" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project.";
 function App() {
 
+	const [leagueVersionSet, setLeagueVersionSet] = React.useState(false);
+
 	React.useEffect(() => {
 		const disclaimerCookie = 'shownDisclaimer';
 		if (!document.cookie.split('; ').find(row => row.startsWith(disclaimerCookie))) {
 			alert(disclaimer);
 			document.cookie = `${disclaimerCookie}=true; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=Lax; Secure`;
 		}
+		updateLeagueVersion().then((res) => {
+			alert('league version set');
+			setLeagueVersionSet(true);
+		});
 	}, [])
 
-	return <div style={{minHeight: "100vh"}} className="col centerCross">
+	return !leagueVersionSet ? null : <div style={{minHeight: "100vh"}} className="col centerCross">
 		<header className="centerAll">
 			<h1><span>RCHK</span> Championships</h1>
 		</header>

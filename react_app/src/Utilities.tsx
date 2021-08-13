@@ -84,9 +84,12 @@ export const CallAPIJson = async (
     }
 );
 
-export const GetProfileIconUrl = (iconId: number): string => `http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/${iconId}.png`;
+var LEAGUE_VERSION: string|undefined = undefined;
+export const updateLeagueVersion = async () => LEAGUE_VERSION ?? (LEAGUE_VERSION = (await CallAPI('/getLeagueVersion', RestfulType.GET))['res']);
 
-export const GetChampIconUrl = (champ: string): string => `http://ddragon.leagueoflegends.com/cdn/11.11.1/img/champion/${champ}.png`;
+export const GetProfileIconUrl = (iconId: number): string => `http://ddragon.leagueoflegends.com/cdn/${LEAGUE_VERSION}/img/profileicon/${iconId}.png`;
+
+export const GetChampIconUrl = (champ: string): string => `http://ddragon.leagueoflegends.com/cdn/${LEAGUE_VERSION}/img/champion/${champ}.png`;
 export const GetChampDisplayName = (champ: string): string => {
     switch(champ){
         case "MonkeyKing":
@@ -96,8 +99,8 @@ export const GetChampDisplayName = (champ: string): string => {
     }
 }
 
-export const GetItemIconUrl = (iconId: number): string => `https://ddragon.leagueoflegends.com/cdn/11.12.1/img/item/${iconId}.png`;
-export const GetSpellIconUrl = (spellName: string): string => `https://ddragon.leagueoflegends.com/cdn/11.10.1/img/spell/${spellName}.png`;
+export const GetItemIconUrl = (iconId: number): string => `https://ddragon.leagueoflegends.com/cdn/${LEAGUE_VERSION}/img/item/${iconId}.png`;
+export const GetSpellIconUrl = (spellName: string): string => `https://ddragon.leagueoflegends.com/cdn/${LEAGUE_VERSION}/img/spell/${spellName}.png`;
 export const GetKeystoneIconUrl = (partialUrl: string): string => `https://ddragon.leagueoflegends.com/cdn/img/${partialUrl}`;
 
 //https://stackoverflow.com/questions/1322732/convert-seconds-to-hh-mm-ss-with-javascript
