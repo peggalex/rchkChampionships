@@ -60,7 +60,6 @@ function App() {
 			document.cookie = `${disclaimerCookie}=true; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=Lax; Secure`;
 		}
 		updateLeagueVersion().then((res) => {
-			alert('league version set');
 			setLeagueVersionSet(true);
 		});
 	}, [])
