@@ -39,7 +39,7 @@ def makeRequest(query: str, level = 0):
     return res.json()
 
 CHAMPS_ID_TO_NAME = {}
-CHAMPS_JSON_URL = "http://ddragon.leagueoflegends.com/cdn/11.12.1/data/en_US/champion.json"
+CHAMPS_JSON_URL = "http://ddragon.leagueoflegends.com/cdn/11.16.1/data/en_US/champion.json"
 
 def UpdateChampsIdToName():
     global CHAMPS_ID_TO_NAME
